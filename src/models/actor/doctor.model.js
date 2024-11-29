@@ -21,27 +21,5 @@ module.exports = (sequelize) => {
     }
   );
 
-  // Associate Doctor with other models here
-  Doctor.associate = (models) => {
-    Doctor.hasMany(models.MedicalRecord, {
-      foreignKey: 'doctor_id',
-      // as: 'medicalRecords',
-    });
-    Doctor.hasMany(models.Appointment, {
-      foreignKey: 'doctor_id',
-      // as: 'appointments',
-    });
-    Doctor.hasMany(models.Prescription, {
-      foreignKey: 'doctor_id',
-      // as: 'prescriptions',
-    });
-    Doctor.hasMany(models.DoctorAvailability, {
-      foreignKey: 'doctor_id',
-      // as: 'doctorAvailabilities',
-    });
-    // Doctor.belongsToMany(models.Specialization, {
-    //   through: 'DoctorSpecialization',
-    // });
-  };
   return Doctor;
 };

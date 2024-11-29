@@ -22,11 +22,5 @@ module.exports = (sequelize) => {
     }
   );
 
-  Lab.associate = (models) => {
-    Lab.belongsToMany(models.MedicalRecord, {
-      through: 'MedicalRecordLab',
-    });
-  };
-
   return Lab;
 };

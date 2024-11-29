@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       // }
     );
 
-    MedicalRecord.hasMany(models.VitalSign, {
+    MedicalRecord.hasMany(models.VitalSigns, {
       foreignKey: 'medical_record_id',
       // as: 'vitalSigns',
     });

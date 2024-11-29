@@ -38,12 +38,5 @@ module.exports = (sequelize) => {
     }
   );
 
-  Medicine.associate = (models) => {
-    Medicine.belongsToMany(models.Prescription, {
-      through: 'PrescriptionMedicine',
-      // as: 'prescriptionMedicines',
-    });
-  };
-
   return Medicine;
 };

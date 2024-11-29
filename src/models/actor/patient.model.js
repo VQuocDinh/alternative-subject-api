@@ -21,16 +21,5 @@ module.exports = (sequelize) => {
     }
   );
 
-  Patient.associate = (models) => {
-    Patient.hasMany(models.MedicalRecord, {
-      foreignKey: 'patient_id',
-      // as: 'medicalRecords',
-    });
-    Patient.hasMany(models.Appointment, {
-      foreignKey: 'patient_id',
-      // as: 'appointments',
-    });
-  };
-
   return Patient;
 };

@@ -80,7 +80,7 @@ db.Appointment = Appointment;
 db.DoctorAvailability = DoctorAvailability;
 
 db.MedicalRecord = MedicalRecord;
-db.VitalSign = VitalSign;
+db.VitalSigns = VitalSign;
 db.Lab = Lab;
 db.MedicalRecordLab = MedicalRecordLab;
 
@@ -92,6 +92,55 @@ db.PrescriptionMedicine = PrescriptionMedicine;
 db.MedicationHistory = MedicationHistory;
 db.MedicationSchedule = MedicationSchedule;
 
+// Thiết lập quan hệ (associations)
+db.Doctor.hasMany(db.MedicalRecord, {
+  foreignKey: 'doctor_id',
+  // as: 'medicalRecords',
+});
+db.Doctor.hasMany(db.Appointment, {
+  foreignKey: 'doctor_id',
+  // as: 'appointments',
+});
+db.Doctor.hasMany(db.Prescription, {
+  foreignKey: 'doctor_id',
+  // as: 'prescriptions',
+});
+db.Doctor.hasMany(db.DoctorAvailability, {
+  foreignKey: 'doctor_id',
+  // as: 'doctorAvailabilities',
+});
+// db.Doctor.belongsToMany(db.Specialization, {
+//   through: 'DoctorSpecialization',
+// });
+db.Patient.hasMany(db.MedicalRecord, {
+  foreignKey: 'patient_id',
+});
+db.Patient.hasMany(db.Appointment, {
+  foreignKey: 'patient_id',
+});
+db.Appointment.belongsTo(db.Patient);
+db.Appointment.belongsTo(db.Doctor);
+db.DoctorAvailability.belongsTo(db.Doctor);
+db.Lab.belongsToMany(db.MedicalRecord, {
+  through: 'MedicalRecordLab',
+});
+db.VitalSigns.belongsTo(db.MedicalRecord);
+Medicine.belongsToMany(db.Prescription, {
+  through: 'PrescriptionMedicine',
+});
+db.Prescription.belongsTo(db.MedicalRecord);
+db.Prescription.belongsTo(db.Doctor);
+db.Prescription.belongsToMany(db.Medicine, {
+  through: 'PrescriptionMedicine',
+});
+db.MedicationHistory.belongsTo(db.MedicationSchedule);
+db.MedicationSchedule.belongsTo(db.PrescriptionMedicine);
+db.MedicationSchedule.hasMany(db.MedicationHistory, {
+  foreignKey: 'schedule_id',
+});
+// db.Specialization.belongsToMany(db.Doctor, {
+//   through: 'DoctorSpecialization',
+// });
 // Synchronize models with database
 const syncDatabase = async () => {
   try {
@@ -104,8 +153,6 @@ const syncDatabase = async () => {
 
 // Call the sync function to sync the models
 syncDatabase();
-
-// Thiết lập quan hệ (associations)
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

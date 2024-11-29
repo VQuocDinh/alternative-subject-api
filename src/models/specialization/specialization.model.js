@@ -17,10 +17,4 @@ module.exports = (sequelize) => {
   };
 
   const Specialization = sequelize.define('Specialization', attributes, options);
-
-  // Specialization.associate = (models) => {
-  //   Specialization.belongsToMany(models.Doctor, {
-  //     through: 'DoctorSpecialization',
-  //   });
-  // };
 };

@@ -32,12 +32,6 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: 'updated_at',
     }
   );
-  MedicationSchedule.associate = (models) => {
-    MedicationSchedule.belongsTo(models.PrescriptionMedicine);
-    MedicationSchedule.hasMany(models.MedicationHistory, {
-      foreignKey: 'schedule_id',
-    });
-  };
 
   return MedicationSchedule;
 };

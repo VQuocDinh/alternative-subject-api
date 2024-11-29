@@ -32,9 +32,5 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  MedicationHistory.associate = (models) => {
-    MedicationHistory.belongsTo(models.MedicationSchedule);
-  };
-
   return MedicationHistory;
 };

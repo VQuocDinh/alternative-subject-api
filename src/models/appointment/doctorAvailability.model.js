@@ -27,15 +27,5 @@ module.exports = (sequelize) => {
     }
   );
 
-  DoctorAvailability.associate = (models) => {
-    DoctorAvailability.belongsTo(
-      models.Doctor
-      //    {
-      //   foreignKey: 'doctor_id',
-      //   as: 'doctor',
-      // }
-    );
-  };
-
   return DoctorAvailability;
 };

@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       medical_record_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: 'MedicalRecord', key: 'id' },
       },
       temperature: {
         type: DataTypes.DECIMAL,
@@ -45,10 +44,6 @@ module.exports = (sequelize, DataTypes) => {
       underscored: true,
     }
   );
-
-  VitalSigns.associate = (models) => {
-    VitalSigns.belongsTo(models.MedicalRecord);
-  };
 
   return VitalSigns;
 };

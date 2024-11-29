@@ -36,14 +36,5 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Prescription.associate = (models) => {
-    Prescription.belongsTo(models.MedicalRecord);
-    Prescription.belongsTo(models.Doctor);
-    Prescription.belongsToMany(models.Medicine, {
-      through: 'PrescriptionMedicine',
-      // as: 'prescriptionMedicines',
-    });
-  };
-
   return Prescription;
 };
