@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
       prescription_medicine_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'PrescriptionMedicine', key: 'id' },
       },
       schedule_time: {
         type: DataTypes.DATE,
@@ -34,13 +33,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   MedicationSchedule.associate = (models) => {
-    MedicationSchedule.belongsTo(models.PrescriptionMedicine, {
-      foreignKey: 'prescription_medicine_id',
-      as: 'prescriptionMedicine',
-    });
+    MedicationSchedule.belongsTo(models.PrescriptionMedicine);
     MedicationSchedule.hasMany(models.MedicationHistory, {
       foreignKey: 'schedule_id',
-      as: 'medicationHistories',
     });
   };
 

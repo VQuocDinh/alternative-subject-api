@@ -27,14 +27,20 @@ module.exports = (sequelize) => {
   );
 
   Appointment.associate = (models) => {
-    Appointment.belongsTo(models.Patient, {
-      foreignKey: 'patient_id',
-      as: 'patient',
-    });
-    Appointment.belongsTo(models.Doctor, {
-      foreignKey: 'doctor_id',
-      as: 'doctor',
-    });
+    Appointment.belongsTo(
+      models.Patient
+      //   {
+      //   foreignKey: 'patient_id',
+      //   as: 'patient',
+      // }
+    );
+    Appointment.belongsTo(
+      models.Doctor
+      //   {
+      //   foreignKey: 'doctor_id',
+      //   as: 'doctor',
+      // }
+    );
   };
 
   return Appointment;

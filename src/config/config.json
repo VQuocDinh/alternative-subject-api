@@ -1,23 +1,23 @@
 {
   "development": {
     "username": "root",
-    "password": "Dinh2202",
+    "password": "tien1234",
     "database": "prms",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "logging": false,
-    "timezone":"+07:00"
+    "timezone": "+07:00"
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": "tien1234",
     "database": "database_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": null,
+    "password": "tien1234",
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "mysql"

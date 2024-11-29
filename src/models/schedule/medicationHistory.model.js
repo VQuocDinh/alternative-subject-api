@@ -33,10 +33,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   MedicationHistory.associate = (models) => {
-    MedicationHistory.belongsTo(models.MedicationSchedule, {
-      foreignKey: 'schedule_id',
-      as: 'medicationSchedule',
-    });
+    MedicationHistory.belongsTo(models.MedicationSchedule);
   };
 
   return MedicationHistory;

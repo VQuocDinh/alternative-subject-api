@@ -10,13 +10,13 @@ module.exports = (sequelize, DataTypes) => {
       },
       medical_record_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: 'MedicalRecord', key: 'id' },
+        // allowNull: false,
+        // references: { model: 'MedicalRecord', key: 'id' },
       },
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'Doctor', key: 'id' },
+        // references: { model: 'Doctor', key: 'id' },
       },
       prescribed_at: {
         type: DataTypes.DATE,
@@ -37,18 +37,11 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Prescription.associate = (models) => {
-    Prescription.belongsTo(models.MedicalRecord, {
-      foreignKey: 'medical_record_id',
-      as: 'medicalRecord',
-    });
-    Prescription.belongsTo(models.Doctor, {
-      foreignKey: 'doctor_id',
-      as: 'doctor',
-    });
-    Prescription.hasMany(models.PrescriptionMedicine, {
-      foreignKey: 'prescription_id',
-      sourceKey: 'id',
-      as: 'prescriptionMedicines',
+    Prescription.belongsTo(models.MedicalRecord);
+    Prescription.belongsTo(models.Doctor);
+    Prescription.belongsToMany(models.Medicine, {
+      through: 'PrescriptionMedicine',
+      // as: 'prescriptionMedicines',
     });
   };
 

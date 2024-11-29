@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'Doctor', key: 'id' },
+        // references: { model: 'Doctor', key: 'id' },
       },
       day_of_week: DataTypes.STRING,
       start_time: DataTypes.DATE,
@@ -28,10 +28,13 @@ module.exports = (sequelize) => {
   );
 
   DoctorAvailability.associate = (models) => {
-    DoctorAvailability.belongsTo(models.Doctor, {
-      foreignKey: 'doctor_id',
-      as: 'doctor',
-    });
+    DoctorAvailability.belongsTo(
+      models.Doctor
+      //    {
+      //   foreignKey: 'doctor_id',
+      //   as: 'doctor',
+      // }
+    );
   };
 
   return DoctorAvailability;

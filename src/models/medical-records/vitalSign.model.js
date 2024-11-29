@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   VitalSigns.associate = (models) => {
-    VitalSigns.belongsTo(models.MedicalRecord, { foreignKey: 'medical_record_id' });
+    VitalSigns.belongsTo(models.MedicalRecord);
   };
 
   return VitalSigns;

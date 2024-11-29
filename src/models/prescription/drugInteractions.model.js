@@ -1,3 +1,5 @@
+const { DataTypes } = require('sequelize');
+
 module.exports = (sequelize) => {
   const DrugInteractions = sequelize.define(
     'DrugInteractions',
@@ -16,6 +18,8 @@ module.exports = (sequelize) => {
       updatedAt: 'updated_at',
     }
   );
+
+  return DrugInteractions;
 };
 
 // sửa đi

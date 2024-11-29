@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 
-module.exports;
 module.exports = (sequelize) => {
   const Doctor = sequelize.define(
     'Doctor',
@@ -15,38 +14,34 @@ module.exports = (sequelize) => {
       phone_number: DataTypes.STRING,
     },
     {
-      tableName: 'doctors',
+      tableName: 'doctor',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     }
   );
+
+  // Associate Doctor with other models here
   Doctor.associate = (models) => {
     Doctor.hasMany(models.MedicalRecord, {
       foreignKey: 'doctor_id',
-      sourceKey: 'id',
-      as: 'medicalRecords',
+      // as: 'medicalRecords',
     });
     Doctor.hasMany(models.Appointment, {
       foreignKey: 'doctor_id',
-      sourceKey: 'id',
-      as: 'appointments',
+      // as: 'appointments',
     });
     Doctor.hasMany(models.Prescription, {
       foreignKey: 'doctor_id',
-      sourceKey: 'id',
-      as: 'prescriptions',
+      // as: 'prescriptions',
     });
     Doctor.hasMany(models.DoctorAvailability, {
       foreignKey: 'doctor_id',
-      sourceKey: 'id',
-      as: 'doctorAvailabilities',
+      // as: 'doctorAvailabilities',
     });
-    Doctor.hasMany(models.DoctorSpecialization, {
-      foreignKey: 'doctor_id',
-      sourceKey: 'id',
-      as: 'doctorSpecializations',
-    });
+    // Doctor.belongsToMany(models.Specialization, {
+    //   through: 'DoctorSpecialization',
+    // });
   };
   return Doctor;
 };

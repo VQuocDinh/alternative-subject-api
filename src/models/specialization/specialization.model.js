@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 
-export const Specialization = (sequelize) => {
+module.exports = (sequelize) => {
   const attributes = {
     id: {
       type: DataTypes.INTEGER,
@@ -15,5 +15,12 @@ export const Specialization = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   };
-  return sequelize.define('Specialization', attributes, options);
+
+  const Specialization = sequelize.define('Specialization', attributes, options);
+
+  // Specialization.associate = (models) => {
+  //   Specialization.belongsToMany(models.Doctor, {
+  //     through: 'DoctorSpecialization',
+  //   });
+  // };
 };

@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
       patient_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'Patient', key: 'id' },
+        // references: { model: 'Patient', key: 'id' },
       },
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'Doctor', key: 'id' },
+        // references: { model: 'Doctor', key: 'id' },
       },
       diagnosis: {
         type: DataTypes.TEXT,
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       status: {
         type: DataTypes.STRING,
-        defaultValue: 'in_treatment',
+        // defaultValue: 'in_treatment',
       },
     },
     {
@@ -43,32 +43,34 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   MedicalRecord.associate = (models) => {
-    MedicalRecord.belongsTo(models.Patient, {
-      foreignKey: 'patient_id',
-      as: 'patient',
-    });
+    MedicalRecord.belongsTo(
+      models.Patient
+      //   {
+      //   foreignKey: 'patient_id',
+      //   as: 'patient',
+      // }
+    );
 
-    MedicalRecord.belongsTo(models.Doctor, {
-      foreignKey: 'doctor_id',
-      as: 'doctor',
-    });
+    MedicalRecord.belongsTo(
+      models.Doctor
+      //   {
+      //   foreignKey: 'doctor_id',
+      //   as: 'doctor',
+      // }
+    );
 
-    MedicalRecord.hasMany(models.VitalSigns, {
+    MedicalRecord.hasMany(models.VitalSign, {
       foreignKey: 'medical_record_id',
-      sourceKey: 'id',
-      as: 'vitalSigns',
+      // as: 'vitalSigns',
     });
 
     MedicalRecord.hasMany(models.Prescription, {
       foreignKey: 'medical_record_id',
-      sourceKey: 'id',
-      as: 'prescriptions',
+      // as: 'prescriptions',
     });
 
-    MedicalRecord.hasMany(models.MedicalRecordLab, {
-      foreignKey: 'medical_record_id',
-      sourceKey: 'id',
-      as: 'medicalRecordLabs',
+    MedicalRecord.belongsToMany(models.Lab, {
+      through: 'MedicalRecordLab',
     });
   };
 

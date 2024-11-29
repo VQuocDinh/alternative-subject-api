@@ -4,18 +4,13 @@ module.exports = (sequelize) => {
   const PrescriptionMedicine = sequelize.define(
     'PrescriptionMedicine',
     {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       prescription_id: {
         type: DataTypes.INTEGER,
-        references: { model: 'Prescription', key: 'id' },
+        // references: { model: 'Prescription', key: 'id' },
       },
       medicine_id: {
         type: DataTypes.INTEGER,
-        references: { model: 'Medicine', key: 'id' },
+        // references: { model: 'Medicine', key: 'id' },
       },
       quantity: {
         type: DataTypes.INTEGER,
@@ -36,21 +31,6 @@ module.exports = (sequelize) => {
       updatedAt: 'updated_at',
     }
   );
-
-  PrescriptionMedicine.associate = (models) => {
-    PrescriptionMedicine.belongsTo(models.Prescription, {
-      foreignKey: 'prescription_id',
-      as: 'prescription',
-    });
-    PrescriptionMedicine.belongsTo(models.Medicine, {
-      foreignKey: 'medicine_id',
-      as: 'medicine',
-    });
-    PrescriptionMedicine.hasMany(models.MedicationSchedule, {
-      foreignKey: 'prescription_medicine_id',
-      as: 'medicationSchedules',
-    });
-  };
 
   return PrescriptionMedicine;
 };

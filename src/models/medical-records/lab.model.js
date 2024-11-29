@@ -23,11 +23,10 @@ module.exports = (sequelize) => {
   );
 
   Lab.associate = (models) => {
-    Lab.hasMany(models.MedicalRecordLab, {
-      foreignKey: 'lab_id',
-      sourceKey: 'id',
-      as: 'medicalRecordLabs',
+    Lab.belongsToMany(models.MedicalRecord, {
+      through: 'MedicalRecordLab',
     });
   };
+
   return Lab;
 };

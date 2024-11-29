@@ -39,10 +39,9 @@ module.exports = (sequelize) => {
   );
 
   Medicine.associate = (models) => {
-    Medicine.hasMany(models.PrescriptionMedicine, {
-      foreignKey: 'medicine_id',
-      sourceKey: 'id',
-      as: 'prescriptionMedicines',
+    Medicine.belongsToMany(models.Prescription, {
+      through: 'PrescriptionMedicine',
+      // as: 'prescriptionMedicines',
     });
   };
 
