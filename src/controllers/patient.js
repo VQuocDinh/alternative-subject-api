@@ -1,43 +1,62 @@
-import db from "../models/index.js";
-import path from "path";
-import { promises as fs } from "fs";
-import { spawn } from "child_process";
-import { where } from "sequelize";
+import db from '../models/index.js';
+import path from 'path';
+import { promises as fs } from 'fs';
+import { spawn } from 'child_process';
+import patientService from '../service/patient.js';
 
 const getAll = async (req, res) => {
   try {
-    const response = await db.patients.findAll();
-    return res.status(200).json({ success: true, data: response });
+    const result = await patientService.getAll();
+    if (!result.success) {
+      return res.status(500).json(result);
+    }
+
+    const patients = result.data;
+    if (!patients || patients.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No patients found',
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Patients retrieved successfully',
+      data: patients,
+      total: patients.length,
+    });
   } catch (error) {
+    console.error('GetAll Patients Error:', error);
     return res.status(500).json({
-      message: "An error occurred while get patients.",
+      success: false,
+      message: 'Failed to retrieve patients',
       error: error.message,
     });
   }
 };
 
 const saveImageToFile = async (image, filePath) => {
-  const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-  const imageBuffer = Buffer.from(base64Data, "base64");
+  const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+  const imageBuffer = Buffer.from(base64Data, 'base64');
   await fs.writeFile(filePath, imageBuffer);
 };
 
 const recognizeFace = (imagePath) => {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python", ["face_recognition.py", imagePath]);
-    let output = "";
+    const pythonProcess = spawn('python', ['face_recognition.py', imagePath]);
+    let output = '';
 
-    pythonProcess.stdout.on("data", (data) => {
+    pythonProcess.stdout.on('data', (data) => {
       output += data.toString();
     });
 
-    pythonProcess.stderr.on("data", (data) => {
+    pythonProcess.stderr.on('data', (data) => {
       console.error(`Python script error: ${data}`);
     });
 
-    pythonProcess.on("close", (code) => {
+    pythonProcess.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error("Error processing image"));
+        reject(new Error('Error processing image'));
       } else {
         resolve(output.trim());
       }
@@ -53,31 +72,29 @@ const getById = async (patientId) => {
 const getByFace = async (req, res) => {
   const { image } = req.body;
   if (!image) {
-    return res
-      .status(400)
-      .json({ success: false, message: "No image data provided" });
+    return res.status(400).json({ success: false, message: 'No image data provided' });
   }
 
   const tempFileName = `temp_${Date.now()}.jpg`;
-  const tempFilePath = path.join(__dirname, "uploads", tempFileName);
+  const tempFilePath = path.join(__dirname, 'uploads', tempFileName);
 
   try {
     await saveImageToFile(image, tempFilePath);
     const patientId = await recognizeFace(tempFilePath);
 
-    if (patientId && patientId !== "Not found") {
+    if (patientId && patientId !== 'Not found') {
       const patient = await getById(patientId);
       if (patient) {
         res.json({ data: patient });
       } else {
-        res.status(404).json({ error: "Patient not found" });
+        res.status(404).json({ error: 'Patient not found' });
       }
     } else {
-      res.status(404).json({ error: "Face not recognized" });
+      res.status(404).json({ error: 'Face not recognized' });
     }
   } catch (error) {
-    console.error("Server error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   } finally {
     await fs.unlink(tempFilePath).catch(console.error);
   }
@@ -98,12 +115,12 @@ const findByPk = async (req, res) => {
     }
     return res.status(400).json({
       success: false,
-      message: "Not found patient",
+      message: 'Not found patient',
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "An error occurred while get patient.",
+      message: 'An error occurred while get patient.',
       error: error.message,
     });
   }
@@ -118,11 +135,11 @@ const searchPatient = async (req, res) => {
     if (response && response.length > 0) {
       res.status(200).json({ success: true, data: response });
     } else {
-      res.status(201).json({ success: false, message: "Not found patient" });
+      res.status(201).json({ success: false, message: 'Not found patient' });
     }
   } catch (error) {
     res.status(500).json({
-      message: "An error occurred while get patients.",
+      message: 'An error occurred while get patients.',
       error: error.message,
     });
   }
@@ -140,11 +157,11 @@ const deletePatient = async (req, res) => {
       }
     );
     if (response) {
-      res.status(200).json({ success: true, message: "Delete successed" });
+      res.status(200).json({ success: true, message: 'Delete successed' });
     }
   } catch (error) {
     res.status(500).json({
-      message: "An error occurred while delete patients.",
+      message: 'An error occurred while delete patients.',
       error: error.message,
     });
   }
@@ -164,7 +181,7 @@ const addPatient = async (req, res) => {
     emergency_contact_phone,
     blood_type,
   } = req.body;
-  console.log(req.body)
+  console.log(req.body);
 
   try {
     const response = await db.patients.create({
@@ -183,16 +200,16 @@ const addPatient = async (req, res) => {
     if (response) {
       res.status(200).json({
         success: true,
-        message: "Add patient successed",
+        message: 'Add patient successed',
         patientId: response.patient_id,
       });
     }
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      message: "An error occurred while add patinet.",
+      message: 'An error occurred while add patinet.',
       error: error.message,
-      error
+      error,
     });
   }
 };
@@ -218,24 +235,14 @@ const editPatient = async (req, res) => {
       }
     );
     if (response) {
-      return res
-        .status(200)
-        .json({ success: true, data: "Staff updated successfully" });
+      return res.status(200).json({ success: true, data: 'Staff updated successfully' });
     }
   } catch (error) {
-    console.error("Error updating staff:", error);
+    console.error('Error updating staff:', error);
     return res.status(500).json({
-      message: "An error occurred while get staffs.",
+      message: 'An error occurred while get staffs.',
       error: error.message,
     });
   }
 };
-export {
-  getAll,
-  getByFace,
-  findByPk,
-  searchPatient,
-  deletePatient,
-  addPatient,
-  editPatient,
-};
+export { getAll, getByFace, findByPk, searchPatient, deletePatient, addPatient, editPatient };
