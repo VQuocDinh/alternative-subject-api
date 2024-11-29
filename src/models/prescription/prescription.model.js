@@ -37,9 +37,19 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Prescription.associate = (models) => {
-    Prescription.belongsTo(models.MedicalRecord, { foreignKey: 'medical_record_id' });
-    Prescription.belongsTo(models.Doctor, { foreignKey: 'doctor_id' });
-    Prescription.hasMany(models.PrescriptionMedicine, { foreignKey: 'prescription_id' });
+    Prescription.belongsTo(models.MedicalRecord, {
+      foreignKey: 'medical_record_id',
+      as: 'medicalRecord',
+    });
+    Prescription.belongsTo(models.Doctor, {
+      foreignKey: 'doctor_id',
+      as: 'doctor',
+    });
+    Prescription.hasMany(models.PrescriptionMedicine, {
+      foreignKey: 'prescription_id',
+      sourceKey: 'id',
+      as: 'prescriptionMedicines',
+    });
   };
 
   return Prescription;

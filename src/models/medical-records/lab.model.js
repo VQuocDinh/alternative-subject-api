@@ -1,24 +1,33 @@
 import { DataTypes } from 'sequelize';
 
-export const Lab = (sequelize) => {
-  const attributes = {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+module.exports = (sequelize) => {
+  const Lab = sequelize.define(
+    'Lab',
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      lab_name: DataTypes.STRING,
+      location: DataTypes.STRING,
+      contact_number: DataTypes.STRING,
+      available_test: DataTypes.TEXT,
     },
-    lab_name: DataTypes.STRING,
-    location: DataTypes.STRING,
-    contact_number: DataTypes.STRING,
-    available_test: DataTypes.TEXT,
-  };
+    {
+      tableName: 'lab',
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    }
+  );
 
-  const options = {
-    tableName: 'lab',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+  Lab.associate = (models) => {
+    Lab.hasMany(models.MedicalRecordLab, {
+      foreignKey: 'lab_id',
+      sourceKey: 'id',
+      as: 'medicalRecordLabs',
+    });
   };
-
-  return sequelize.define('Lab', attributes, options);
+  return Lab;
 };

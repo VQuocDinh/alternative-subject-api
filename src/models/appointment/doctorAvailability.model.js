@@ -1,25 +1,38 @@
 const { DataTypes } = require('sequelize');
 
-const DoctorAvailability = (sequelize) => {
-  const attributes = {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+module.exports = (sequelize) => {
+  const DoctorAvailability = sequelize.define(
+    'DoctorAvailability',
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      doctor_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'Doctor', key: 'id' },
+      },
+      day_of_week: DataTypes.STRING,
+      start_time: DataTypes.DATE,
+      end_time: DataTypes.DATE,
+      is_available: DataTypes.BOOLEAN,
     },
-    doctor_id: DataTypes.INTEGER,
-    day_of_week: DataTypes.STRING,
-    start_time: DataTypes.DATE,
-    end_time: DataTypes.DATE,
-    is_available: DataTypes.BOOLEAN,
+    {
+      tableName: 'doctor_availability',
+      timestamps: true,
+      createdAt: 'create_time',
+      updatedAt: 'update_time',
+    }
+  );
+
+  DoctorAvailability.associate = (models) => {
+    DoctorAvailability.belongsTo(models.Doctor, {
+      foreignKey: 'doctor_id',
+      as: 'doctor',
+    });
   };
 
-  const options = {
-    tableName: 'doctor_availability',
-    timestamps: true,
-    createdAt: 'create_time',
-    updatedAt: 'update_time',
-  };
-
-  return sequelize.define('DoctorAvailability', attributes, options);
+  return DoctorAvailability;
 };
