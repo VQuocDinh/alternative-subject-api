@@ -129,7 +129,9 @@ Medicine.belongsToMany(db.Prescription, {
   through: 'PrescriptionMedicine',
 });
 db.Prescription.belongsTo(db.MedicalRecord);
-db.Prescription.belongsTo(db.Doctor);
+db.Prescription.belongsTo(db.Doctor, {
+  as: 'doctor',
+});
 db.Prescription.belongsToMany(db.Medicine, {
   through: 'PrescriptionMedicine',
 });
@@ -144,7 +146,7 @@ db.MedicationSchedule.hasMany(db.MedicationHistory, {
 // Synchronize models with database
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ force: true }); // Will alter the table if needed
+    await sequelize.sync({ after: true }); // Will alter the table if needed
     console.log('Database synced successfully');
   } catch (error) {
     console.error('Error syncing database: ', error);
