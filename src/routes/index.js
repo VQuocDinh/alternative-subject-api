@@ -10,6 +10,7 @@ import patientRecords from './patientRecords'
 import vitalSigns from './vitalSigns'
 import deparments from './departments'
 import roles from './roles'
+import prescriptions from './prescription'
 
 
 const initRoutes = (app) =>{
@@ -25,6 +26,7 @@ const initRoutes = (app) =>{
     app.use('/api/vital-signs', vitalSigns)
     app.use('/api/departments', deparments)
     app.use('/api/role', roles)
+    app.use('/api/prescription', prescriptions)
 
     return app.use('/',(req,res) => {
         return res.send('SERVER ON')

@@ -26,7 +26,6 @@ const getAll = async (req, res) => {
       total: patients.length,
     });
   } catch (error) {
-    console.error('GetAll Patients Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to retrieve patients',
