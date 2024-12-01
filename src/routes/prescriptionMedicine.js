@@ -2,7 +2,6 @@ import * as controllers from '../controllers'
 import express from 'express'
 
 const router =express.Router()
-router.get('/getByPatient', controllers.getPrescriptionByPaTient)
-router.get('/getById', controllers.getPrescriptionById)
+router.get('/get', controllers.getPrescriptionMedicine)
 
 export default router

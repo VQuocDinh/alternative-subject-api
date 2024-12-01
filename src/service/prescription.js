@@ -1,7 +1,8 @@
+import { where } from 'sequelize';
 import db from '../models';
 
 class Prescription {
-  async getPrescriptionByPaTient() {
+  async getPrescriptionByPaTient(patient_id) {
     try {
       const prescriptions = await db.Prescription.findAll({
         order: [['updated_at', 'DESC']],
@@ -16,7 +17,7 @@ class Prescription {
           },
           {
             model: db.MedicalRecord,
-            attributes: ['patient_id'],
+            where: { patient_id },
           },
         ],
       });
@@ -31,6 +32,54 @@ class Prescription {
       };
     }
   }
+
+  async getPrescriptionById(id) {
+    if (!id) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_INPUT',
+          message: 'Invalid prescription ID provided.',
+        },
+      };
+    }
+    try {
+      const prescription = await db.Prescription.findByPk(id, {
+        include: [
+          {
+            model: db.Doctor,
+            as: 'doctor',
+            include: [{ model: db.Specialization }],
+          },
+        ],
+      });
+  
+      if (!prescription) {
+        return {
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Prescription not found.',
+          },
+        };
+      }
+  
+      return {
+        success: true,
+        data: prescription,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'SERVER_ERROR',
+          message: 'Error retrieving prescription by ID.',
+          details: error.message,
+        },
+      };
+    }
+  }
+  
 }
 
 const prescriptionService = new Prescription();
