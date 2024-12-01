@@ -72,5 +72,4 @@ const getPrescriptionById = async (req, res) => {
   }
 };
 
-
 export { getPrescriptionByPaTient, getPrescriptionById };

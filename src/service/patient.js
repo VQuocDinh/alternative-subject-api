@@ -3,11 +3,10 @@ import db from "../models"
 class PatientService {
     async getAll() {
         try {
-            const patients = await db.patients.findAll({
-                where: { status: 1 },
-                order: [['updatedAt', 'DESC']],
+            const patients = await db.Patient.findAll({
+                order: [['updated_at', 'DESC']],
                 attributes: {
-                    exclude: ['createdAt', 'updatedAt']
+                    exclude: ['created_at', 'updated_at']
                 }
             });
             return {

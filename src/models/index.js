@@ -163,7 +163,7 @@ db.Specialization.belongsToMany(db.Doctor, {
 // Synchronize models with database
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ force: true }); // Will alter the table if needed
+    await sequelize.sync({ after: true }); // Will alter the table if needed
     console.log('Database synced successfully');
   } catch (error) {
     console.error('Error syncing database: ', error);
