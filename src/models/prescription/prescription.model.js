@@ -26,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
       notes: {
         type: DataTypes.TEXT,
       },
+      status: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        defaultValue: 'new'
+      },
     },
     {
       tableName: 'prescription',

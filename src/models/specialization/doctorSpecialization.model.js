@@ -1,4 +1,5 @@
 import { DataTypes } from 'sequelize';
+import db from '..';
 
 module.exports = (sequelize) => {
   const DoctorSpecialization = sequelize.define(
@@ -7,10 +8,18 @@ module.exports = (sequelize) => {
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: db.Doctor,
+          key: 'id',
+        },
       },
       specialization_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: db.Specialization,
+          key: 'id',
+        },
       },
     },
     {
