@@ -69,7 +69,11 @@ const DoctorSpecialization = require('./specialization/doctorSpecialization.mode
   Sequelize.DataTypes
 );
 
+const User = require('./auth/user.model.js')(sequelize, Sequelize.DataTypes);
+const Roles = require('./auth/role.model.js')(sequelize, Sequelize.DataTypes);
 // Add các model vào object db
+db.User = User;
+db.Roles = Roles;
 db.Specialization = Specialization;
 
 db.Doctor = Doctor;

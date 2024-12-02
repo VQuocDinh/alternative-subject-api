@@ -1,9 +1,9 @@
-import AuthService from "../service/auth";
+import authService from '../service/auth.js'
 
 const register = async (req, res) => {
   const { email, password } = req.body;
   try {
-    await AuthService.registerUser(email, password);
+    await authService.registerUser(email, password);
     return res.status(200).json({
       success: true,
       message: "Account registered successfully."
@@ -19,7 +19,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const userData = await AuthService.loginUser(email, password);
+    const userData = await authService.loginUser(email, password);
     return res.status(200).json({
       success: true,
       ...userData,
