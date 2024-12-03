@@ -3,19 +3,42 @@ import morgan from 'morgan';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import connection from './config/connectDB.js';
 import initRoutes from './src/routes/index.js';
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger.config.js');
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
+app.use(morgan('dev'));
 app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use(express.json());
-app.use(cors());
-app.use(morgan('combined'));
+app.use(
+  cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Origin',
+      'X-Requested-With',
+      'Accept',
+      'Access-Control-Allow-Headers',
+      'Access-Control-Allow-Origin',
+      'Access-Control-Allow-Methods',
+      'Access-Control-Request-Headers',
+      'Access-Control-Request-Method',
+      'X-Client-Id',
+      'X-Api-Key',
+    ],
+  })
+);
 
-connection();
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 initRoutes(app);
 
 app.listen(port, () => {
