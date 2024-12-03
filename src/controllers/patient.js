@@ -3,35 +3,16 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import { spawn } from 'child_process';
 import patientService from '../service/patient.js';
+import { SuccessResponse } from '../core/success.response.js';
 
-const getAll = async (req, res) => {
-  try {
-    const result = await patientService.getAll();
-    if (!result.success) {
-      return res.status(500).json(result);
-    }
-
-    const patients = result.data;
-    if (!patients || patients.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'No patients found',
-        data: [],
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      message: 'Patients retrieved successfully',
-      data: patients,
-      total: patients.length,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve patients',
-      error: error.message,
-    });
-  }
+const getAll = async (req, res, next) => {
+  new SuccessResponse({
+    message: 'All patients',
+    metadata: await patientService.getAll({
+      page: req.params.page,
+      limit: req.params.limit,
+    }),
+  }).send(res);
 };
 
 const saveImageToFile = async (image, filePath) => {

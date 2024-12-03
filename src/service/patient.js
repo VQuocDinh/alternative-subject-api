@@ -1,25 +1,28 @@
-import db from "../models"
+import db from '../models';
 
 class PatientService {
-    async getAll() {
-        try {
-            const patients = await db.Patient.findAll({
-                order: [['updated_at', 'DESC']],
-                attributes: {
-                    exclude: ['created_at', 'updated_at']
-                }
-            });
-            return {
-                success: true,
-                data: patients
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: 'Error getting patients: ' + error.message
-            };
-        }
-    }
+  async getAll({ limit = 20, page = 1 }) {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { rows: patients, count } = await db.Patient.findAndCountAll({
+      offset: offset,
+      limit: parseInt(limit),
+      order: [['created_at', 'DESC']],
+    });
+    // Example
+    /**
+     * If not founr
+     * throw new Error("........")
+     */
+    return {
+      data: patients,
+      meta: {
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+        totalPages: Math.ceil(count / parseInt(limit)),
+        totalItems: count,
+      },
+    };
+  }
 }
 
 const patientService = new PatientService();
