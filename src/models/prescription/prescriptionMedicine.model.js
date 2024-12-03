@@ -4,14 +4,12 @@ module.exports = (sequelize) => {
   const PrescriptionMedicine = sequelize.define(
     'PrescriptionMedicine',
     {
-      prescription_id: {
-        type: DataTypes.INTEGER,
-        // references: { model: 'Prescription', key: 'id' },
-      },
-      medicine_id: {
-        type: DataTypes.INTEGER,
-        // references: { model: 'Medicine', key: 'id' },
-      },
+      // prescription_id: {
+      //   type: DataTypes.INTEGER,
+      // },
+      // medicine_id: {
+      //   type: DataTypes.INTEGER,
+      // },
       quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,

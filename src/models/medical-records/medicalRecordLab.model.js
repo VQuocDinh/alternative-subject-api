@@ -2,21 +2,6 @@ import { DataTypes } from 'sequelize';
 
 module.exports = (sequelize) => {
   const attributes = {
-    // id: {
-    //   type: DataTypes.INTEGER,
-    //   primaryKey: true,
-    //   autoIncrement: true,
-    // },
-    medical_record_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      // references: { model: 'MedicalRecords', key: 'id' },
-    },
-    lab_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      // references: { model: 'Lab', key: 'id' },
-    },
     result: {
       type: DataTypes.TEXT,
     },

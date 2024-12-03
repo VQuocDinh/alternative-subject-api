@@ -12,7 +12,6 @@ module.exports = (sequelize) => {
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        // references: { model: 'Doctor', key: 'id' },
       },
       day_of_week: DataTypes.STRING,
       start_time: DataTypes.DATE,

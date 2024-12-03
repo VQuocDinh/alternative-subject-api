@@ -6,9 +6,9 @@ const env = process.env.NODE_ENV || 'development';
 const configEnv = config[env];
 
 // Initialize Sequelize instance with the correct environment configuration
-const sequelize = new Sequelize('prms', 'root', 'Dinh2202', {
-  host: 'localhost',
-  dialect: 'mysql',
+const sequelize = new Sequelize(configEnv.database, configEnv.username, configEnv.password, {
+  host: configEnv.host,
+  dialect: configEnv.dialect,
 });
 
 sequelize
@@ -97,77 +97,117 @@ db.MedicationHistory = MedicationHistory;
 db.MedicationSchedule = MedicationSchedule;
 
 // Thiết lập quan hệ (associations)
+// Medical Record
 db.Doctor.hasMany(db.MedicalRecord, {
   foreignKey: 'doctor_id',
-  // as: 'medicalRecords',
+  as: 'MedicalRecord',
 });
+db.MedicalRecord.belongsTo(db.Doctor, {
+  foreignKey: 'doctor_id',
+  as: 'Doctor',
+});
+db.Patient.hasMany(db.MedicalRecord, {
+  foreignKey: 'patient_id',
+  as: 'MedicalRecord',
+});
+db.MedicalRecord.belongsTo(db.Patient, {
+  foreignKey: 'patient_id',
+  as: 'Patient',
+});
+
+// Associate for Appointment
 db.Doctor.hasMany(db.Appointment, {
   foreignKey: 'doctor_id',
-  // as: 'appointments',
+  as: 'Appointment',
 });
-db.Doctor.hasMany(db.Prescription, {
+db.Appointment.belongsTo(db.Doctor, {
   foreignKey: 'doctor_id',
-  // as: 'prescriptions',
+  as: 'Doctor',
 });
-db.Doctor.hasMany(db.DoctorAvailability, {
-  foreignKey: 'doctor_id',
-  // as: 'doctorAvailabilities',
+db.Patient.hasMany(db.Appointment, {
+  foreignKey: 'patient_id',
+  as: 'Appointment',
+});
+db.Appointment.belongsTo(db.Patient, {
+  foreignKey: 'patient_id',
+  as: 'Patient',
+});
+
+// Associate for DoctorSpecialization
+db.Specialization.belongsToMany(db.Doctor, {
+  through: 'DoctorSpecialization',
+  foreignKey: 'specialization_id',
 });
 db.Doctor.belongsToMany(db.Specialization, {
   through: 'DoctorSpecialization',
   foreignKey: 'doctor_id',
-  otherKey: 'specialization_id',
-});
-db.Patient.hasMany(db.MedicalRecord, {
-  foreignKey: 'patient_id',
-});
-db.Patient.hasMany(db.Appointment, {
-  foreignKey: 'patient_id',
-});
-db.Appointment.belongsTo(db.Patient);
-db.Appointment.belongsTo(db.Doctor);
-db.DoctorAvailability.belongsTo(db.Doctor);
-db.Lab.belongsToMany(db.MedicalRecord, {
-  through: 'MedicalRecordLab',
-});
-db.VitalSigns.belongsTo(db.MedicalRecord);
-// Medicine.belongsToMany(db.Prescription, {
-//   through: 'PrescriptionMedicine',
-// });
-db.Prescription.belongsTo(db.MedicalRecord);
-db.Prescription.belongsTo(db.Doctor, {
-  as: 'doctor',
-});
-// db.Prescription.belongsToMany(db.Medicine, {
-//   through: 'PrescriptionMedicine',
-// });
-db.Prescription.hasMany(db.PrescriptionMedicine, {
-  foreignKey: 'prescription_id', // Chỉ định tên khoá ngoại cụ thể
-});
-db.PrescriptionMedicine.belongsTo(db.Prescription, {
-  foreignKey: 'prescription_id', // Tên khoá ngoại phải đồng nhất
 });
 
-db.Medicine.hasMany(db.PrescriptionMedicine, {
-  foreignKey: 'medicine_id', // Tên khoá ngoại cụ thể
+// Associate for Prescription
+db.Doctor.hasMany(db.Prescription, {
+  foreignKey: 'doctor_id',
+  as: 'Prescription',
 });
-db.PrescriptionMedicine.belongsTo(db.Medicine, {
+db.Prescription.belongsTo(db.Doctor, {
+  through: 'Prescription',
+  foreignKey: 'doctor_id',
+});
+db.MedicalRecord.hasMany(db.Prescription, {
+  foreignKey: 'medical_record_id',
+  as: 'MedicalRecord',
+});
+db.Prescription.belongsTo(db.MedicalRecord, {
+  foreignKey: 'medical_record_id',
+  as: 'MedicalRecord',
+});
+db.Prescription.belongsToMany(db.Medicine, {
+  through: 'PrescriptionMedicine',
+  foreignKey: 'prescription_id',
+});
+db.Medicine.belongsToMany(db.Prescription, {
+  through: 'PrescriptionMedicine',
   foreignKey: 'medicine_id',
 });
+
+// Associate for Doctor Availability
+db.Doctor.hasMany(db.DoctorAvailability, {
+  foreignKey: 'doctor_id',
+  as: 'DoctorAvailability',
+});
+db.DoctorAvailability.belongsTo(db.Doctor, {
+  foreignKey: 'doctor_id',
+  as: 'Doctor',
+});
+// Lab
+db.Lab.belongsToMany(db.MedicalRecord, {
+  through: 'MedicalRecordLab',
+  foreignKey: 'lab_id',
+});
+db.MedicalRecord.belongsToMany(db.Lab, {
+  through: 'MedicalRecordLab',
+  foreignKey: 'medical_record_id',
+});
+
+// Associate
+db.VitalSigns.belongsTo(db.MedicalRecord, {
+  foreignKey: 'medical_record_id',
+  as: 'MedicalRecord',
+});
+db.MedicalRecord.hasMany(db.VitalSigns, {
+  foreignKey: 'medical_record_id',
+  as: 'VitalSigns',
+});
+
 db.MedicationHistory.belongsTo(db.MedicationSchedule);
 db.MedicationSchedule.belongsTo(db.PrescriptionMedicine);
 db.MedicationSchedule.hasMany(db.MedicationHistory, {
   foreignKey: 'schedule_id',
 });
-db.Specialization.belongsToMany(db.Doctor, {
-  through: 'DoctorSpecialization',
-  foreignKey: 'specialization_id',
-  otherKey: 'doctor_id',
-});
+
 // Synchronize models with database
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ after: true }); // Will alter the table if needed
+    await sequelize.sync({ alert: true }); // Will alter the table if needed
     console.log('Database synced successfully');
   } catch (error) {
     console.error('Error syncing database: ', error);
