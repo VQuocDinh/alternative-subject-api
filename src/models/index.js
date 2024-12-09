@@ -198,6 +198,17 @@ db.MedicalRecord.hasMany(db.VitalSigns, {
   as: 'VitalSigns',
 });
 
+// Drug Interactions associations
+db.DrugInteractions.belongsTo(db.Medicine, {
+  as: 'Medicine1',
+  foreignKey: 'medicine_id_1'
+});
+
+db.DrugInteractions.belongsTo(db.Medicine, {
+  as: 'Medicine2',
+  foreignKey: 'medicine_id_2'
+});
+
 db.MedicationHistory.belongsTo(db.MedicationSchedule);
 db.MedicationSchedule.belongsTo(db.PrescriptionMedicine);
 db.MedicationSchedule.hasMany(db.MedicationHistory, {

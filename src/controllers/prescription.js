@@ -72,4 +72,11 @@ const getPrescriptionById = async (req, res) => {
   }
 };
 
-export { getPrescriptionByPaTient, getPrescriptionById };
+const addPrescription = async (req, res, next) => {
+  new SuccessResponse({
+    message: 'Add Prescription successfully',
+    metadata: await prescriptionService.addPrescription(),
+  }).send(res);
+};
+
+export { getPrescriptionByPaTient, getPrescriptionById, addPrescription };
