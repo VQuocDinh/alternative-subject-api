@@ -9,8 +9,8 @@ const getAll = async (req, res, next) => {
   new SuccessResponse({
     message: 'All patients',
     metadata: await patientService.getAll({
-      page: req.params.page,
-      limit: req.params.limit,
+      page: req.query.page,
+      limit: req.query.limit,
     }),
   }).send(res);
 };
