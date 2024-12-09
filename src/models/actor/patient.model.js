@@ -12,11 +12,6 @@ module.exports = (sequelize) => {
       full_name: DataTypes.STRING,
       dob: DataTypes.STRING,
       phone: DataTypes.STRING,
-      cccd: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
     },
     {
       tableName: 'patient',
