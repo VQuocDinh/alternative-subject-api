@@ -121,6 +121,22 @@ class MedicalRecordService {
     await medicalRecord.destroy();
     return 'Medical Record deleted successfully';
   }
+
+  /**
+   * Count the number of each status in medical records
+   * @returns {Object} Count of each status
+   */
+  static async countMedicalRecordStatuses() {
+    const statuses = await db.MedicalRecord.findAll({
+      attributes: ['status', [db.Sequelize.fn('COUNT', db.Sequelize.col('status')), 'count']],
+      group: ['status'],
+    });
+
+    return statuses.reduce((acc, status) => {
+      acc[status.status] = status.dataValues.count;
+      return acc;
+    }, {});
+  }
 }
 
 export default MedicalRecordService;

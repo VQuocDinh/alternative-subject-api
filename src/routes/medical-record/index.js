@@ -177,4 +177,24 @@ router.patch('/:id/status', asyncHandler(medicalRecordController.changeStatusMed
  */
 router.delete('/:id', asyncHandler(medicalRecordController.deleteMedicalRecord));
 
+/**
+ * @swagger
+ * /medical-records/statuses/count:
+ *   get:
+ *     summary: Count the number of each status in medical records
+ *     tags: [Medical Records]
+ *     responses:
+ *       200:
+ *         description: Count of each status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties:
+ *                 type: integer
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/statuses/count', asyncHandler(medicalRecordController.countMedicalRecordStatuses));
+
 export default router;

@@ -25,6 +25,12 @@ class MedicalRecordController {
       metadata: await MedicalRecordService.getAllMedicalRecords(req.query),
     }).send(res);
   };
+
+  countMedicalRecordStatuses = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await MedicalRecordService.countMedicalRecordStatuses(),
+    }).send(res);
+  };
 }
 
 export default new MedicalRecordController();
