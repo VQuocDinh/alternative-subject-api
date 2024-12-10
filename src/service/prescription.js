@@ -53,7 +53,7 @@ class Prescription {
           },
         ],
       });
-  
+
       if (!prescription) {
         return {
           success: false,
@@ -63,7 +63,7 @@ class Prescription {
           },
         };
       }
-  
+
       return {
         success: true,
         data: prescription,
@@ -79,7 +79,35 @@ class Prescription {
       };
     }
   }
-  
+
+  async addPrescription(prescriptionData) {
+    try {
+      const { medical_record_id, doctor_id, notes, status } = prescriptionData;
+      if (!medical_record_id || !doctor_id) {
+        throw new Error('Medical record ID and doctor ID are required');
+      }
+      const newPrescription = await db.Prescription.create({
+        medical_record_id,
+        doctor_id,
+        notes,
+        status: status || 'new',
+        prescribed_at: new Date(),
+      });
+      return {
+        success: true,
+        data: newPrescription,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'SERVER_ERROR',
+          message: 'Error adding prescription.',
+          details: error.message,
+        },
+      };
+    }
+  }
 }
 
 const prescriptionService = new Prescription();
