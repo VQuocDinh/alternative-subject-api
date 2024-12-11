@@ -1,14 +1,30 @@
-import db from '../models/index.js';
+import { SuccessResponse } from '../core/success.response.js';
+import AccountService from '../service/account.service.js';
 
-const getAccount = async (req, res) => {
-  try {
-    const response = await db.accounts.findAll();
-    return res.status(200).json({ success: true, data: response });
-  } catch (error) {
-    return res.status(500).json({
-      message: 'An error occurred while get accounts.',
-      error: error.message,
-    });
-  }
-};
-export { getAccount };
+class AccountController {
+  getAccount = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await AccountService.getAccount(),
+    }).send(res);
+  };
+
+  createAccount = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await AccountService.createAccount(req.body),
+    }).send(res);
+  };
+
+  updateAccount = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await AccountService.updateAccount(req.params.id, req.body),
+    }).send(res);
+  };
+
+  deleteAccount = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await AccountService.deleteAccount(req.params.id),
+    }).send(res);
+  };
+}
+
+export default new AccountController();
