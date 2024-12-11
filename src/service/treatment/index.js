@@ -214,7 +214,7 @@ class TreatmentService {
    * @returns {Object} Thông tin chỉ số sinh tồn vừa được tạo
    */
   static async addVitalSigns(medicalRecordId, vitalSignsData) {
-    const { temperature, blood_pressure, heart_rate, respiratory_rate, weight, height } =
+    const { temperature, blood_pressure, heart_rate, respiratory_rate, weight, height, bmi, note } =
       vitalSignsData;
 
     // Kiểm tra bệnh án có tồn tại không
@@ -223,10 +223,10 @@ class TreatmentService {
       throw new NotFoundError('Medical Record not found');
     }
 
-    // Kiểm tra trạng thái bệnh án
-    if (medicalRecord.status !== 'nurse_received') {
-      throw new BadRequestError('Cannot add vital signs unless the status is "nurse_received"');
-    }
+    // // Kiểm tra trạng thái bệnh án
+    // if (medicalRecord.status !== 'nurse_received') {
+    //   throw new BadRequestError('Cannot add vital signs unless the status is "nurse_received"');
+    // }
 
     // Tạo mới một bản ghi chỉ số sinh tồn
     const newVitalSigns = await db.VitalSigns.create({
@@ -236,6 +236,8 @@ class TreatmentService {
       heart_rate,
       respiratory_rate,
       weight,
+      bmi,
+      note,
       height,
       create_at: new Date(),
       update_at: new Date(),
