@@ -1,15 +1,8 @@
-const { DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
+// models/PrescriptionMedicine.js
+module.exports = (sequelize, DataTypes) => {
   const PrescriptionMedicine = sequelize.define(
     'PrescriptionMedicine',
     {
-      // prescription_id: {
-      //   type: DataTypes.INTEGER,
-      // },
-      // medicine_id: {
-      //   type: DataTypes.INTEGER,
-      // },
       quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -18,13 +11,20 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      frequency: DataTypes.STRING,
-      duration: DataTypes.INTEGER,
-      instructions: DataTypes.TEXT,
+      frequency: {
+        type: DataTypes.STRING,
+      },
+      duration: {
+        type: DataTypes.INTEGER,
+      },
+      instructions: {
+        type: DataTypes.TEXT,
+      },
     },
     {
       tableName: 'prescription_medicine',
       timestamps: true,
+      underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     }

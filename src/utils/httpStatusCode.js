@@ -1,4 +1,4 @@
-import statusCodes from './reasonPhrases';
+import statusCodes from './statusCodes';
 import reasonPhrases from './reasonPhrases';
 
 export const { StatusCodes, ReasonPhrases } = {
