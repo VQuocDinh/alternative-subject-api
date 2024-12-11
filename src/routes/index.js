@@ -3,7 +3,7 @@ import patient from './patient';
 import staff from './staff';
 import account from './account';
 import healthIndicators from './healthIndicator';
-import medicalRecords from './medicalRecords';
+import medicalRecords from './medical-record';
 import recordIndicators from './recordIndicators';
 import appointment from './appointment';
 import patientRecords from './patientRecords';
@@ -15,6 +15,9 @@ import prescriptionMedicine from './prescriptionMedicine';
 import specialization from './specialization';
 import doctorSpecialization from './doctor_specialization';
 import doctor from './doctor';
+import medicine from './medicine';
+import drugInteraction from './drugInteraction';
+import treatment from './treatment';
 
 const initRoutes = (app) => {
   app.use('/api/auth', auth);
@@ -23,6 +26,7 @@ const initRoutes = (app) => {
   app.use('/api/account', account);
   app.use('/api/health-indicator', healthIndicators);
   app.use('/api/medical-records', medicalRecords);
+  app.use('/api/treatment', treatment);
   app.use('/api/record-indicators', recordIndicators);
   app.use('/api/appointment', appointment);
   app.use('/api/patient-records', patientRecords);
@@ -34,6 +38,9 @@ const initRoutes = (app) => {
   app.use('/api/specialization', specialization);
   app.use('/api/doctor-specialization', doctorSpecialization);
   app.use('/api/doctor', doctor);
+  app.use('/api/medicine', medicine);
+  app.use('/api/drug-interaction', drugInteraction);
+
   return app.use('/', (req, res) => {
     return res.send('SERVER ON');
   });

@@ -15,3 +15,4 @@ export * from './prescriptionMedicine';
 export * from './specialization';
 export * from './doctor_specialization';
 export * from './doctor';
+export * from './medicine';

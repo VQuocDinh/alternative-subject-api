@@ -39,10 +39,4 @@ class ForbiddenError extends ErrorResponse {
   }
 }
 
-module.exports = {
-  ConflictRequestError,
-  BadRequestError,
-  AuthFailureError,
-  NotFoundError,
-  ForbiddenError,
-};
+export { ConflictRequestError, BadRequestError, AuthFailureError, NotFoundError, ForbiddenError };

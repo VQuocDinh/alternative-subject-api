@@ -151,7 +151,6 @@ db.Doctor.hasMany(db.Prescription, {
   as: 'Prescription',
 });
 db.Prescription.belongsTo(db.Doctor, {
-  through: 'Prescription',
   foreignKey: 'doctor_id',
 });
 db.MedicalRecord.hasMany(db.Prescription, {
@@ -163,12 +162,14 @@ db.Prescription.belongsTo(db.MedicalRecord, {
   as: 'MedicalRecord',
 });
 db.Prescription.belongsToMany(db.Medicine, {
-  through: 'PrescriptionMedicine',
+  through: db.PrescriptionMedicine,
   foreignKey: 'prescription_id',
+  as: 'Medicine',
 });
 db.Medicine.belongsToMany(db.Prescription, {
-  through: 'PrescriptionMedicine',
+  through: db.PrescriptionMedicine,
   foreignKey: 'medicine_id',
+  as: 'Prescription',
 });
 
 // Associate for Doctor Availability
@@ -198,6 +199,17 @@ db.VitalSigns.belongsTo(db.MedicalRecord, {
 db.MedicalRecord.hasMany(db.VitalSigns, {
   foreignKey: 'medical_record_id',
   as: 'VitalSigns',
+});
+
+// Drug Interactions associations
+db.DrugInteractions.belongsTo(db.Medicine, {
+  as: 'Medicine1',
+  foreignKey: 'medicine_id_1',
+});
+
+db.DrugInteractions.belongsTo(db.Medicine, {
+  as: 'Medicine2',
+  foreignKey: 'medicine_id_2',
 });
 
 db.MedicationHistory.belongsTo(db.MedicationSchedule);
