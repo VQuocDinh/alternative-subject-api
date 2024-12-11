@@ -135,12 +135,14 @@ db.Appointment.belongsTo(db.Patient, {
 
 // Associate for DoctorSpecialization
 db.Specialization.belongsToMany(db.Doctor, {
-  through: 'DoctorSpecialization',
+  through: db.DoctorSpecialization,
   foreignKey: 'specialization_id',
+  otherKey: 'doctor_id',
 });
 db.Doctor.belongsToMany(db.Specialization, {
-  through: 'DoctorSpecialization',
+  through: db.DoctorSpecialization,
   foreignKey: 'doctor_id',
+  otherKey: 'specialization_id',
 });
 
 // Associate for Prescription
