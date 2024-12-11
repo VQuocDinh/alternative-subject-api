@@ -1,82 +1,27 @@
 import prescriptionService from '../service/prescription.js';
+import { SuccessResponse } from '../core/success.response.js';
 
-const getPrescriptionByPaTient = async (req, res) => {
-  const { patientId } = req.query;
-  try {
-    const result = await prescriptionService.getPrescriptionByPaTient(patientId);
-    if (!result.success) {
-      return res.status(500).json(result);
-    }
-
-    const prescriptions = result.data;
-    if (!prescriptions || prescriptions.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'No patieprescriptionsnts found',
-        data: [],
-      });
-    }
-    return res.status(200).json({
-      success: true,
+class PrescriptionController {
+  getPrescriptionByPaTient = async (req, res, next) => {
+    new SuccessResponse({
       message: 'Prescriptions retrieved successfully',
-      data: prescriptions,
-      total: prescriptions.length,
-    });
-  } catch (error) {
-    console.error('GetAll prescriptions Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve patients',
-      error: error.message,
-    });
-  }
-};
+      metadata: await prescriptionService.getPrescriptionByPatient(req.params.patientId),
+    }).send(res);
+  };
 
-const getPrescriptionById = async (req, res) => {
-  const { id } = req.query;
+  getPrescriptionById = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'Prescription detail retrieved successfully',
+      metadata: await prescriptionService.getPrescriptionById(req.params.id),
+    }).send(res);
+  };
 
-  if (!id) {
-    return res.status(400).json({
-      success: false,
-      error: {
-        code: 'INVALID_INPUT',
-        message: 'Prescription ID is required.',
-      },
-    });
-  }
+  addPrescription = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'Add Prescription successfully',
+      metadata: await prescriptionService.addPrescription(req.body),
+    }).send(res);
+  };
+}
 
-  try {
-    const response = await prescriptionService.getPrescriptionById(id);
-
-    if (!response.success) {
-      return res.status(500).json({
-        success: false,
-        error: response.error,
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Prescription detail retrieved successfully.',
-      data: response.data,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: {
-        code: 'SERVER_ERROR',
-        message: 'An unexpected error occurred.',
-        details: error.message,
-      },
-    });
-  }
-};
-
-const addPrescription = async (req, res, next) => {
-  new SuccessResponse({
-    message: 'Add Prescription successfully',
-    metadata: await prescriptionService.addPrescription(),
-  }).send(res);
-};
-
-export { getPrescriptionByPaTient, getPrescriptionById, addPrescription };
+export default new PrescriptionController();

@@ -11,7 +11,6 @@ import vitalSigns from './vitalSigns';
 import deparments from './departments';
 import roles from './roles';
 import prescriptions from './prescription';
-import prescriptionMedicine from './prescriptionMedicine';
 import medicine from './medicine';
 import drugInteraction from './drugInteraction';
 import treatment from './treatment';
@@ -31,7 +30,6 @@ const initRoutes = (app) => {
   app.use('/api/departments', deparments);
   app.use('/api/role', roles);
   app.use('/api/prescription', prescriptions);
-  app.use('/api/prescriptionMedicine', prescriptionMedicine);
   app.use('/api/medicine', medicine);
   app.use('/api/drug-interaction', drugInteraction);
 
