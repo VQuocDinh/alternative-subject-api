@@ -1,4 +1,5 @@
 import express from 'express';
+import { asyncHandler } from '../helper/asyncHandler';
 import PrescriptionController from '../controllers/prescription.js';
 
 const router = express.Router();
@@ -31,7 +32,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.get('/list/:patientId', PrescriptionController.getPrescriptionByPaTient);
+router.get('/list/:patientId', asyncHandler(PrescriptionController.getPrescriptionByPaTient));
 
 /**
  * @swagger
@@ -54,7 +55,7 @@ router.get('/list/:patientId', PrescriptionController.getPrescriptionByPaTient);
  *       500:
  *         description: Internal server error
  */
-router.get('/:id', PrescriptionController.getPrescriptionById);
+router.get('/:id', asyncHandler(PrescriptionController.getPrescriptionById));
 
 /**
  * @swagger
@@ -93,6 +94,6 @@ router.get('/:id', PrescriptionController.getPrescriptionById);
  *       500:
  *         description: Internal server error
  */
-router.post('/', PrescriptionController.addPrescription);
+router.post('/', asyncHandler(PrescriptionController.addPrescription));
 
 export default router;

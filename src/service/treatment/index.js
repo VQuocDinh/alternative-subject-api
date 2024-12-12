@@ -22,8 +22,54 @@ class TreatmentService {
     const { rows: records, count } = await db.MedicalRecord.findAndCountAll({
       where: whereClause,
       include: [
-        { model: db.Doctor, as: 'Doctor', attributes: ['first_name', 'last_name'] },
-        { model: db.Patient, as: 'Patient', attributes: ['full_name', 'dob', 'phone', 'id'] },
+        { model: db.Patient, as: 'Patient' },
+        {
+          model: db.Doctor,
+          as: 'Doctor',
+        },
+      ],
+      limit,
+      offset,
+      order: [['created_at', 'DESC']],
+    });
+
+    console.log(records);
+
+    return {
+      data: records,
+      meta: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalPages: Math.ceil(count / limit),
+        totalItems: count,
+      },
+    };
+  }
+
+  /**
+   * Get all medical records by patient ID
+   * @param {number} patientId - ID of the patient
+   * @param {number} page - Current page
+   * @param {number} limit - Number of records per page
+   * @returns {Object} List of medical records by patient ID
+   */
+  static async getRecordsByPatientId({ patientId, page = 1, limit = 20 }) {
+    const offset = (page - 1) * limit;
+
+    const { rows: records, count } = await db.MedicalRecord.findAndCountAll({
+      where: { patient_id: patientId },
+      include: [
+        {
+          model: db.Doctor,
+          as: 'Doctor',
+          include: [
+            {
+              model: db.Specialization,
+              through: db.DoctorSpecialization,
+            },
+          ],
+        },
+        { model: db.Patient, as: 'Patient' },
       ],
       limit,
       offset,
@@ -111,8 +157,17 @@ class TreatmentService {
         ],
       },
       include: [
-        { model: db.Doctor, as: 'Doctor', attributes: ['first_name', 'last_name'] },
-        { model: db.Patient, as: 'Patient', attributes: ['full_name'] },
+        {
+          model: db.Doctor,
+          as: 'Doctor',
+          include: [
+            {
+              model: db.Specialization,
+              through: db.DoctorSpecialization,
+            },
+          ],
+        },
+        { model: db.Patient, as: 'Patient' },
       ],
       limit,
       offset,
@@ -159,7 +214,7 @@ class TreatmentService {
    * @returns {Object} Thông tin chỉ số sinh tồn vừa được tạo
    */
   static async addVitalSigns(medicalRecordId, vitalSignsData) {
-    const { temperature, blood_pressure, heart_rate, respiratory_rate, weight, height } =
+    const { temperature, blood_pressure, heart_rate, respiratory_rate, weight, height, bmi, note } =
       vitalSignsData;
 
     // Kiểm tra bệnh án có tồn tại không
@@ -168,10 +223,10 @@ class TreatmentService {
       throw new NotFoundError('Medical Record not found');
     }
 
-    // Kiểm tra trạng thái bệnh án
-    if (medicalRecord.status !== 'nurse_received') {
-      throw new BadRequestError('Cannot add vital signs unless the status is "nurse_received"');
-    }
+    // // Kiểm tra trạng thái bệnh án
+    // if (medicalRecord.status !== 'nurse_received') {
+    //   throw new BadRequestError('Cannot add vital signs unless the status is "nurse_received"');
+    // }
 
     // Tạo mới một bản ghi chỉ số sinh tồn
     const newVitalSigns = await db.VitalSigns.create({
@@ -181,6 +236,8 @@ class TreatmentService {
       heart_rate,
       respiratory_rate,
       weight,
+      bmi,
+      note,
       height,
       create_at: new Date(),
       update_at: new Date(),
@@ -204,16 +261,7 @@ class TreatmentService {
     // Lấy danh sách chỉ số sinh tồn
     const vitalSigns = await db.VitalSigns.findAll({
       where: { medical_record_id: medicalRecordId },
-      attributes: [
-        'id',
-        'temperature',
-        'blood_pressure',
-        'heart_rate',
-        'respiratory_rate',
-        'weight',
-        'height',
-        'create_at',
-      ],
+      include: [{ model: db.MedicalRecord, as: 'MedicalRecord' }],
       order: [['create_at', 'DESC']],
     });
 

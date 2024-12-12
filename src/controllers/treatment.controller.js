@@ -88,6 +88,22 @@ class TreatmentController {
       metadata: await TreatmentService.addDiagnosis(medicalRecordId, diagnosisData),
     }).send(res);
   };
+
+  /**
+   * Lấy danh sách bệnh án theo ID bệnh nhân
+   */
+  getRecordsByPatientId = async (req, res, next) => {
+    const { patientId } = req.params;
+    const { page, limit } = req.query;
+
+    new SuccessResponse({
+      metadata: await TreatmentService.getRecordsByPatientId({
+        patientId: parseInt(patientId, 10),
+        page: parseInt(page, 10) || 1,
+        limit: parseInt(limit, 10) || 20,
+      }),
+    }).send(res);
+  };
 }
 
 export default new TreatmentController();
