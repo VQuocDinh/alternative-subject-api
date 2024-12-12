@@ -22,8 +22,8 @@ class TreatmentService {
     const { rows: records, count } = await db.MedicalRecord.findAndCountAll({
       where: whereClause,
       include: [
-        { model: db.Doctor, as: 'Doctor', attributes: ['first_name', 'last_name'] },
-        { model: db.Patient, as: 'Patient', attributes: ['full_name', 'dob', 'phone', 'id'] },
+        { model: db.Doctor, as: 'Doctor' },
+        { model: db.Patient, as: 'Patient' },
       ],
       limit,
       offset,
@@ -111,8 +111,8 @@ class TreatmentService {
         ],
       },
       include: [
-        { model: db.Doctor, as: 'Doctor', attributes: ['first_name', 'last_name'] },
-        { model: db.Patient, as: 'Patient', attributes: ['full_name'] },
+        { model: db.Doctor, as: 'Doctor' },
+        { model: db.Patient, as: 'Patient' },
       ],
       limit,
       offset,
@@ -204,16 +204,6 @@ class TreatmentService {
     // Lấy danh sách chỉ số sinh tồn
     const vitalSigns = await db.VitalSigns.findAll({
       where: { medical_record_id: medicalRecordId },
-      attributes: [
-        'id',
-        'temperature',
-        'blood_pressure',
-        'heart_rate',
-        'respiratory_rate',
-        'weight',
-        'height',
-        'create_at',
-      ],
       order: [['create_at', 'DESC']],
     });
 
