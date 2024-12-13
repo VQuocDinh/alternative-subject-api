@@ -136,6 +136,174 @@ class MedicalRecordService {
       return acc;
     }, {});
   }
+
+  /**
+   * Get all diagnoses with pagination and sorting
+   * @param {Object} params - Query parameters
+   * @param {number} params.page - Page number
+   * @param {number} params.limit - Items per page
+   * @returns {Object} Paginated diagnoses
+   */
+  static async getAllDiagnoses({ page = 1, limit = 20 }) {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { rows: diagnoses, count } = await db.Diagnosis.findAndCountAll({
+      offset,
+      limit: parseInt(limit),
+      order: [['taken_time', 'DESC']],
+    });
+
+    return {
+      data: diagnoses,
+      meta: {
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+        totalPages: Math.ceil(count / parseInt(limit)),
+        totalItems: count,
+      },
+    };
+  }
+
+  /**
+   * Get a single diagnosis by ID and medical record ID
+   * @param {number} medicalRecordId - Medical record ID
+   * @param {number} diagnosisId - Diagnosis ID
+   * @returns {Object} Diagnosis
+   * @throws {NotFoundError} If the diagnosis is not found
+   */
+  static async getDiagnosisById(medicalRecordId, diagnosisId) {
+    const diagnosis = await db.Diagnosis.findOne({
+      where: { id: diagnosisId, medical_record_id: medicalRecordId },
+      include: [{ model: db.Disease, as: 'Disease' }],
+    });
+
+    if (!diagnosis) {
+      throw new NotFoundError('Diagnosis not found');
+    }
+
+    return diagnosis;
+  }
+
+  /**
+   * Add a new diagnosis to a specific medical record
+   * @param {number} medicalRecordId - Medical record ID
+   * @param {Object} data - Diagnosis data
+   * @returns {Object} New diagnosis
+   * @throws {BadRequestError} If required fields are missing
+   */
+  static async addNewDiagnosis(medicalRecordId, data) {
+    const { doctor_id, disease_name, icd10_code, treatment_plan, symptoms, taken_time, note } =
+      data;
+
+    // Validate input data
+    if (!doctor_id || !disease_name || !icd10_code || !treatment_plan || !symptoms || !taken_time) {
+      throw new BadRequestError('All fields except note are required');
+    }
+
+    const newDiagnosis = await db.Diagnosis.create(
+      {
+        doctor_id,
+        medical_record_id: medicalRecordId,
+        disease_name,
+        icd10_code,
+        treatment_plan,
+        symptoms,
+        taken_time,
+        note,
+      },
+      {
+        include: [{ model: db.Disease, as: 'Disease' }],
+      }
+    );
+
+    return newDiagnosis;
+  }
+
+  /**
+   * Edit an existing diagnosis for a specific medical record
+   * @param {number} medicalRecordId - Medical record ID
+   * @param {number} diagnosisId - Diagnosis ID
+   * @param {Object} data - Updated diagnosis data
+   * @returns {Object} Updated diagnosis
+   * @throws {NotFoundError} If the diagnosis is not found
+   */
+  static async editDiagnosis(medicalRecordId, diagnosisId, data) {
+    const diagnosis = await db.Diagnosis.findOne({
+      where: { id: diagnosisId, medical_record_id: medicalRecordId },
+    });
+
+    if (!diagnosis) {
+      throw new NotFoundError('Diagnosis not found');
+    }
+
+    await diagnosis.update(data);
+
+    return diagnosis;
+  }
+
+  /**
+   * Delete a diagnosis by ID and medical record ID
+   * @param {number} medicalRecordId - Medical record ID
+   * @param {number} diagnosisId - Diagnosis ID
+   * @returns {string} Deletion success message
+   * @throws {NotFoundError} If the diagnosis is not found
+   */
+  static async deleteDiagnosis(medicalRecordId, diagnosisId) {
+    const diagnosis = await db.Diagnosis.findOne({
+      where: { id: diagnosisId, medical_record_id: medicalRecordId },
+    });
+
+    if (!diagnosis) {
+      throw new NotFoundError('Diagnosis not found');
+    }
+
+    await diagnosis.destroy();
+    return 'Diagnosis deleted successfully';
+  }
+
+  /**
+   * Get all diagnoses by medical record ID with pagination and sorting
+   * @param {number} medicalRecordId - Medical record ID
+   * @param {Object} params - Query parameters
+   * @param {number} params.page - Page number
+   * @param {number} params.limit - Items per page
+   * @returns {Object} Paginated diagnoses
+   * @throws {NotFoundError} If the medical record is not found
+   */
+  static async getAllDiagnosesByMedicalRecord(medicalRecordId, { page = 1, limit = 20 }) {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const medicalRecord = await db.MedicalRecord.findByPk(medicalRecordId, {
+      include: [
+        {
+          model: db.Diagnosis,
+          as: 'Diagnoses',
+          offset,
+          limit: parseInt(limit),
+          order: [['taken_time', 'DESC']],
+        },
+      ],
+    });
+
+    if (!medicalRecord) {
+      throw new NotFoundError('Medical Record not found');
+    }
+
+    const {
+      Diagnoses: diagnoses,
+      Diagnoses: { length: count },
+    } = medicalRecord;
+
+    return {
+      data: diagnoses,
+      meta: {
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+        totalPages: Math.ceil(count / parseInt(limit)),
+        totalItems: count,
+      },
+    };
+  }
 }
 
 export default MedicalRecordService;

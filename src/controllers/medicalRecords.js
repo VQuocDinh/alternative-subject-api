@@ -1,4 +1,4 @@
-import db from "../models/index.js";
+import db from '../models/index.js';
 
 const getById = async (req, res) => {
   try {
@@ -8,7 +8,7 @@ const getById = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "An error occurred while get medical records by id.",
+      message: 'An error occurred while get medical records by id.',
       error: error.message,
     });
   }
@@ -16,24 +16,21 @@ const getById = async (req, res) => {
 
 const addMedicalRecords = async (req, res) => {
   try {
-    const  patient_id  = req.body.patientId;
+    const patient_id = req.body.patientId;
     console.log(req.body.patientId);
     const response = await db.medical_records.create({
       patient_id: patient_id,
     });
     if (response) {
-      return res
-        .status(200)
-        .json({ success: true, message: "Add medical records successed" });
+      return res.status(200).json({ success: true, message: 'Add medical records successed' });
     }
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "An error occurred while add medical records by id.",
+      message: 'An error occurred while add medical records by id.',
       error: error.message,
     });
   }
 };
-
 
 export { getById, addMedicalRecords };
