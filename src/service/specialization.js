@@ -4,7 +4,6 @@ class SpecializationService {
   async getAll() {
     try {
       const specializations = await db.Specialization.findAll({
-        attributes: ['id', 'specialization_name'], // Including 'id' for the frontend to use
         order: [['created_at', 'DESC']], // Sort by creation date in descending order
       });
 

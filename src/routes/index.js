@@ -18,6 +18,7 @@ import doctor from './doctor';
 import medicine from './medicine';
 import drugInteraction from './drugInteraction';
 import treatment from './treatment';
+import disease from './disease';
 
 const initRoutes = (app) => {
   app.use('/api/auth', auth);
@@ -40,6 +41,7 @@ const initRoutes = (app) => {
   app.use('/api/doctor', doctor);
   app.use('/api/medicine', medicine);
   app.use('/api/drug-interaction', drugInteraction);
+  app.use('/api/disease', disease);
 
   return app.use('/', (req, res) => {
     return res.send('SERVER ON');

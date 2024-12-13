@@ -8,14 +8,12 @@ class DoctorSpecializationService {
 
     try {
       const doctors = await db.DoctorSpecialization.findAll({
-        attributes: ['doctor_id'],
         where: {
           specialization_id,
         },
         include: [
           {
             model: db.Doctor,
-            attributes: ['firstname', 'lastname'],
           },
         ],
       });

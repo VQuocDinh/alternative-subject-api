@@ -31,7 +31,6 @@ class PrescriptionService {
         {
           model: db.Doctor,
           as: 'Doctor',
-          attributes: [],
         },
         {
           model: db.MedicalRecord,
@@ -39,10 +38,9 @@ class PrescriptionService {
           include: [{ model: db.Patient, as: 'Patient' }],
         },
       ],
-      attributes: [],
     });
 
-    if (!prescriptions.length) {
+    if (!prescriptions?.length) {
       throw new NotFoundError('No prescriptions found for the given patient ID');
     }
 

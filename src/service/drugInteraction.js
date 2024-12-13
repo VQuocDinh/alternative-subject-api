@@ -3,7 +3,6 @@ import { Op } from 'sequelize';
 
 class DrugInteractionService {
   async checkDrugInteractions(selectedDrugs, newDrug) {
-
     try {
       if (selectedDrugs.length === 0) {
         return {
@@ -47,12 +46,10 @@ class DrugInteractionService {
           {
             model: db.Medicine,
             as: 'Medicine1',
-            attributes: ['id', 'name'],
           },
           {
             model: db.Medicine,
             as: 'Medicine2',
-            attributes: ['id', 'name'],
           },
         ],
       });
