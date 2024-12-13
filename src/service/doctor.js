@@ -117,6 +117,180 @@ class DoctorService {
 
     return doctors;
   }
+
+  /**
+   * Get all availabilities for a doctor
+   * @param {number} doctor_id - Doctor ID
+   * @returns {Array} List of availabilities
+   */
+  static async getAllAvailabilities(doctor_id) {
+    return await db.DoctorAvailability.findAll({ where: { doctor_id } });
+  }
+
+  /**
+   * Get all availabilities for a doctor between start time and end time
+   * @param {number} doctor_id - Doctor ID
+   * @param {string} start_time - Start time
+   * @param {string} end_time - End time
+   * @returns {Array} List of availabilities
+   */
+  static async getAvailabilitiesBetween(doctor_id, start_time, end_time) {
+    return await db.DoctorAvailability.findAll({
+      where: {
+        doctor_id,
+        start_time: {
+          [db.Sequelize.Op.between]: [start_time, end_time],
+        },
+      },
+    });
+  }
+
+  /**
+   * Get a single availability by ID
+   * @param {number} id - Availability ID
+   * @returns {Object} Availability
+   * @throws {NotFoundError} If the availability is not found
+   */
+  static async getAvailabilityById(id) {
+    const availability = await db.DoctorAvailability.findByPk(id);
+    if (!availability) {
+      throw new NotFoundError('Availability not found');
+    }
+    return availability;
+  }
+
+  /**
+   * Add a new availability
+   * @param {Object} availabilityData - Availability data
+   * @returns {Object} New availability
+   * @throws {BadRequestError} If required fields are missing or if there is an overlap with existing availabilities
+   */
+  static async addAvailability(availabilityData) {
+    const { doctor_id, day_of_week, start_time, end_time } = availabilityData;
+
+    // Validate input data
+    if (!doctor_id || !day_of_week || !start_time || !end_time) {
+      throw new BadRequestError('Doctor ID, day of week, start time, and end time are required');
+    }
+
+    // Check for overlapping availabilities
+    const overlappingAvailabilities = await db.DoctorAvailability.findAll({
+      where: {
+        doctor_id,
+        day_of_week,
+        [db.Sequelize.Op.or]: [
+          {
+            start_time: {
+              [db.Sequelize.Op.between]: [start_time, end_time],
+            },
+          },
+          {
+            end_time: {
+              [db.Sequelize.Op.between]: [start_time, end_time],
+            },
+          },
+          {
+            [db.Sequelize.Op.and]: [
+              {
+                start_time: {
+                  [db.Sequelize.Op.lte]: start_time,
+                },
+              },
+              {
+                end_time: {
+                  [db.Sequelize.Op.gte]: end_time,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (overlappingAvailabilities.length > 0) {
+      throw new BadRequestError('Availability overlaps with existing availabilities');
+    }
+
+    const newAvailability = await db.DoctorAvailability.create(availabilityData);
+    return newAvailability;
+  }
+
+  /**
+   * Update an availability
+   * @param {number} id - Availability ID
+   * @param {Object} availabilityData - Availability data
+   * @returns {Object} Updated availability
+   * @throws {NotFoundError} If the availability is not found
+   * @throws {BadRequestError} If there is an overlap with existing availabilities
+   */
+  static async updateAvailability(id, availabilityData) {
+    const availability = await db.DoctorAvailability.findByPk(id);
+    if (!availability) {
+      throw new NotFoundError('Availability not found');
+    }
+
+    const { doctor_id, day_of_week, start_time, end_time } = availabilityData;
+
+    // Check for overlapping availabilities
+    const overlappingAvailabilities = await db.DoctorAvailability.findAll({
+      where: {
+        doctor_id,
+        day_of_week,
+        id: {
+          [db.Sequelize.Op.ne]: id,
+        },
+        [db.Sequelize.Op.or]: [
+          {
+            start_time: {
+              [db.Sequelize.Op.between]: [start_time, end_time],
+            },
+          },
+          {
+            end_time: {
+              [db.Sequelize.Op.between]: [start_time, end_time],
+            },
+          },
+          {
+            [db.Sequelize.Op.and]: [
+              {
+                start_time: {
+                  [db.Sequelize.Op.lte]: start_time,
+                },
+              },
+              {
+                end_time: {
+                  [db.Sequelize.Op.gte]: end_time,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (overlappingAvailabilities.length > 0) {
+      throw new BadRequestError('Availability overlaps with existing availabilities');
+    }
+
+    await availability.update(availabilityData);
+    return availability;
+  }
+
+  /**
+   * Delete an availability by ID
+   * @param {number} id - Availability ID
+   * @returns {string} Deletion success message
+   * @throws {NotFoundError} If the availability is not found
+   */
+  static async deleteAvailability(id) {
+    const availability = await db.DoctorAvailability.findByPk(id);
+    if (!availability) {
+      throw new NotFoundError('Availability not found');
+    }
+
+    await availability.destroy();
+    return 'Availability deleted successfully';
+  }
 }
 
 export default DoctorService;

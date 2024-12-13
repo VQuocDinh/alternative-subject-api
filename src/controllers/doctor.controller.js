@@ -37,6 +37,44 @@ class DoctorController {
       metadata: await doctorService.getDoctorBySpecialization(req.params.specialization_id),
     }).send(res);
   };
+
+  getAllAvailabilities = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await doctorService.getAllAvailabilities(req.params.doctor_id),
+    }).send(res);
+  };
+
+  getAvailabilityById = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await doctorService.getAvailabilityById(req.params.id),
+    }).send(res);
+  };
+
+  addAvailability = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await doctorService.addAvailability(req.body),
+    }).send(res);
+  };
+
+  updateAvailability = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await doctorService.updateAvailability(req.params.id, req.body),
+    }).send(res);
+  };
+
+  deleteAvailability = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await doctorService.deleteAvailability(req.params.id),
+    }).send(res);
+  };
+
+  getAvailabilitiesBetween = async (req, res, next) => {
+    const { start_time, end_time } = req.query;
+    const { doctor_id } = req.params;
+    new SuccessResponse({
+      metadata: await doctorService.getAvailabilitiesBetween(doctor_id, start_time, end_time),
+    }).send(res);
+  };
 }
 
 export default new DoctorController();
