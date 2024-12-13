@@ -93,6 +93,6 @@ router.get('/:id', PrescriptionController.getPrescriptionById);
  *       500:
  *         description: Internal server error
  */
-router.post('/', PrescriptionController.addPrescription);
+router.post('/add', PrescriptionController.addPrescription);
 
 export default router;

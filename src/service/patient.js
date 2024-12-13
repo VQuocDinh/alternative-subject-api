@@ -5,19 +5,21 @@ import { spawn } from 'child_process';
 import { BadRequestError, NotFoundError } from '../core/error.response.js';
 
 class PatientService {
-  getAll = async ({ page, limit }) => {
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+  getAll = async ({ page = 0, limit = 20 }) => {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    const offset = (pageNum - 1) * limitNum;
     const { rows: patients, count } = await db.Patient.findAndCountAll({
       offset: offset,
-      limit: parseInt(limit),
+      limit: limitNum,
       order: [['created_at', 'DESC']],
     });
     return {
       data: patients,
       meta: {
-        currentPage: parseInt(page),
-        itemsPerPage: parseInt(limit),
-        totalPages: Math.ceil(count / parseInt(limit)),
+        currentPage: pageNum,
+        itemsPerPage: limitNum,
+        totalPages: Math.ceil(count / limitNum),
         totalItems: count,
       },
     };
