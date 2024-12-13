@@ -1,6 +1,9 @@
 const Sequelize = require('sequelize');
 const config = require('../config/config.json'); // Cấu hình database của bạn
 
+const fs = require('fs');
+const path = require('path');
+
 // Determine the environment (development, test, or production)
 const env = process.env.NODE_ENV || 'development';
 const configEnv = config[env];
@@ -23,6 +26,7 @@ sequelize
 const db = {};
 
 // Import các model cụ thể
+const Disease = require('../models/disease/disease.model')(sequelize);
 const Doctor = require('./actor/doctor.model')(sequelize, Sequelize.DataTypes);
 const Patient = require('./actor/patient.model')(sequelize, Sequelize.DataTypes);
 
@@ -78,6 +82,8 @@ db.Specialization = Specialization;
 
 db.Doctor = Doctor;
 db.Patient = Patient;
+
+db.Disease = Disease;
 
 db.DoctorSpecialization = DoctorSpecialization;
 db.Appointment = Appointment;
@@ -230,6 +236,50 @@ const syncDatabase = async () => {
 
 // Call the sync function to sync the models
 syncDatabase();
+
+// /**
+//  * Import diseases from a JSON file into the database.
+//  * @param {string} filePath - Path to the JSON file.
+//  * @param {boolean} isArray - Whether the JSON file contains an array of objects.
+//  */
+// const importDiseases = async (filePath, isArray) => {
+//   try {
+//     // Read the JSON file
+//     const data = JSON.parse(fs.readFileSync(path.resolve(filePath), 'utf-8'));
+
+//     let diseases;
+//     if (isArray) {
+//       // If the file is an array of objects
+//       diseases = data.map((item) => ({
+//         code: item.code,
+//         name: item.description.split(',')[0], // Extract name from description
+//         description: item.description,
+//       }));
+//     } else {
+//       // If the file is an object with key-value pairs
+//       diseases = Object.entries(data).map(([code, description]) => ({
+//         code,
+//         name: description.split(',')[0], // Extract name from description
+//         description,
+//       }));
+//     }
+
+//     // Bulk insert into the database
+//     await db.Disease.bulkCreate(diseases, {
+//       updateOnDuplicate: ['name', 'description'], // Update existing records if they exist
+//     });
+
+//     console.log(`Successfully imported ${diseases.length} diseases.`);
+//   } catch (error) {
+//     console.error('Error importing diseases:', error);
+//   }
+// };
+
+// // Example usage
+// importDiseases(`${__dirname}/../common/icd10cm_codes_2022.json`, false);
+
+// // Import from the second JSON format
+// importDiseases(`${__dirname}/../common/icd10cm_codes_2022-2.json`, true);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

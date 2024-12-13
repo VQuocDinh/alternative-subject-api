@@ -13,10 +13,9 @@ class MedicalRecordService {
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     const { rows: medicalRecords, count } = await db.MedicalRecord.findAndCountAll({
-      attributes: ['id', 'diagnosis', 'status', 'created_at'],
       include: [
-        { model: db.Doctor, as: 'Doctor', attributes: ['first_name', 'last_name'] },
-        { model: db.Patient, as: 'Patient', attributes: ['full_name'] },
+        { model: db.Doctor, as: 'Doctor' },
+        { model: db.Patient, as: 'Patient' },
       ],
       offset,
       limit: parseInt(limit),
@@ -43,9 +42,9 @@ class MedicalRecordService {
   static async getMedicalRecordById(id) {
     const medicalRecord = await db.MedicalRecord.findByPk(id, {
       include: [
-        { model: db.Doctor, as: 'Doctor', attributes: ['id', 'first_name', 'last_name'] },
-        { model: db.Patient, as: 'Patient', attributes: ['id', 'full_name'] },
-        { model: db.VitalSigns, as: 'VitalSigns', attributes: ['temperature', 'blood_pressure'] },
+        { model: db.Doctor, as: 'Doctor' },
+        { model: db.Patient, as: 'Patient' },
+        { model: db.VitalSigns, as: 'VitalSigns' },
       ],
     });
 
