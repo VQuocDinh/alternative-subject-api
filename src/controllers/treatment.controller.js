@@ -78,6 +78,16 @@ class TreatmentController {
     }).send(res);
   };
   /**
+   * Xóa chỉ số sinh tồn theo ID
+   */
+  deleteVitalSign = async (req, res, next) => {
+    const { id: vitalSignId } = req.params;
+
+    new SuccessResponse({
+      metadata: await TreatmentService.deleteVitalSign(vitalSignId),
+    }).send(res);
+  };
+  /**
    * Bác sĩ thêm chẩn đoán cho bệnh án
    */
   addDiagnosis = async (req, res, next) => {

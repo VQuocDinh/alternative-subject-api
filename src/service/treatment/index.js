@@ -303,6 +303,21 @@ class TreatmentService {
 
     return medicalRecord;
   }
+
+  /**
+   * Xóa chỉ số sinh tồn theo ID
+   * @param {number} vitalSignId - ID của chỉ số sinh tồn
+   * @returns {Object} Thông tin chỉ số sinh tồn đã bị xóa
+   */
+  static async deleteVitalSign(vitalSignId) {
+    const vitalSign = await db.VitalSigns.findByPk(vitalSignId);
+    if (!vitalSign) {
+      throw new NotFoundError('Vital Sign not found');
+    }
+
+    await vitalSign.destroy();
+    return vitalSign;
+  }
 }
 
 export default TreatmentService;

@@ -268,4 +268,25 @@ router.patch('/records/:id/diagnosis', asyncHandler(TreatmentController.addDiagn
  */
 router.get('/records/patient/:patientId', asyncHandler(TreatmentController.getRecordsByPatientId));
 
+/**
+ * @swagger
+ * /treatment/vital-signs/{id}:
+ *   delete:
+ *     summary: Delete a vital sign by ID
+ *     tags: [Treatment]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Vital Sign ID
+ *     responses:
+ *       200:
+ *         description: Vital sign deleted successfully
+ *       404:
+ *         description: Vital sign not found
+ */
+router.delete('/vital-signs/:id', asyncHandler(TreatmentController.deleteVitalSign));
+
 export default router;
