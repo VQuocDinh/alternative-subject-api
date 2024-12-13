@@ -75,6 +75,7 @@ const DoctorSpecialization = require('./specialization/doctorSpecialization.mode
 
 const User = require('./auth/user.model.js')(sequelize, Sequelize.DataTypes);
 const Roles = require('./auth/role.model.js')(sequelize, Sequelize.DataTypes);
+const Diagnosis = require('./medical-records/diagnosis.model')(sequelize, Sequelize.DataTypes);
 // Add các model vào object db
 db.User = User;
 db.Roles = Roles;
@@ -101,6 +102,8 @@ db.PrescriptionMedicine = PrescriptionMedicine;
 
 db.MedicationHistory = MedicationHistory;
 db.MedicationSchedule = MedicationSchedule;
+
+db.Diagnosis = Diagnosis;
 
 // Thiết lập quan hệ (associations)
 // Medical Record
@@ -222,6 +225,29 @@ db.MedicationHistory.belongsTo(db.MedicationSchedule);
 db.MedicationSchedule.belongsTo(db.PrescriptionMedicine);
 db.MedicationSchedule.hasMany(db.MedicationHistory, {
   foreignKey: 'schedule_id',
+});
+
+// Associate for Diagnosis
+db.Doctor.hasMany(db.Diagnosis, {
+  foreignKey: 'doctor_id',
+  as: 'Diagnoses',
+});
+db.Diagnosis.belongsTo(db.Doctor, {
+  foreignKey: 'doctor_id',
+  as: 'Doctor',
+});
+db.MedicalRecord.hasMany(db.Diagnosis, {
+  foreignKey: 'medical_record_id',
+  as: 'Diagnoses',
+});
+db.Diagnosis.belongsTo(db.MedicalRecord, {
+  foreignKey: 'medical_record_id',
+  as: 'MedicalRecord',
+});
+db.Diagnosis.belongsTo(db.Disease, {
+  foreignKey: 'icd10_code',
+  targetKey: 'code',
+  as: 'Disease',
 });
 
 // Synchronize models with database

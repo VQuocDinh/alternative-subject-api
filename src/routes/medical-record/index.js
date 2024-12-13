@@ -197,4 +197,238 @@ router.delete('/:id', asyncHandler(medicalRecordController.deleteMedicalRecord))
  */
 router.get('/statuses/count', asyncHandler(medicalRecordController.countMedicalRecordStatuses));
 
+/**
+ * @swagger
+ * /medical-records/{medicalRecordId}/diagnoses:
+ *   get:
+ *     summary: Retrieve all diagnoses for a specific medical record
+ *     tags: [Diagnoses]
+ *     parameters:
+ *       - in: path
+ *         name: medicalRecordId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the medical record
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number (default: 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Items per page (default: 20)
+ *     responses:
+ *       200:
+ *         description: List of diagnoses retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                     itemsPerPage:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     totalItems:
+ *                       type: integer
+ *       404:
+ *         description: Medical record not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  '/:medicalRecordId/diagnoses',
+  asyncHandler(medicalRecordController.getAllDiagnosesByMedicalRecord)
+);
+
+/**
+ * @swagger
+ * /medical-records/{medicalRecordId}/diagnoses/{id}:
+ *   get:
+ *     summary: Retrieve a specific diagnosis by ID for a specific medical record
+ *     tags: [Diagnoses]
+ *     parameters:
+ *       - in: path
+ *         name: medicalRecordId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the medical record
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the diagnosis
+ *     responses:
+ *       200:
+ *         description: Diagnosis retrieved successfully
+ *       404:
+ *         description: Diagnosis not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  '/:medicalRecordId/diagnoses/:id',
+  asyncHandler(medicalRecordController.getDiagnosisById)
+);
+
+/**
+ * @swagger
+ * /medical-records/{medicalRecordId}/diagnoses:
+ *   post:
+ *     summary: Create a new diagnosis for a specific medical record
+ *     tags: [Diagnoses]
+ *     parameters:
+ *       - in: path
+ *         name: medicalRecordId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the medical record
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               doctor_id:
+ *                 type: integer
+ *               disease_name:
+ *                 type: string
+ *               icd10_code:
+ *                 type: string
+ *               treatment_plan:
+ *                 type: string
+ *               symptoms:
+ *                 type: string
+ *               taken_time:
+ *                 type: string
+ *                 format: date-time
+ *               note:
+ *                 type: string
+ *             required:
+ *               - doctor_id
+ *               - disease_name
+ *               - icd10_code
+ *               - treatment_plan
+ *               - symptoms
+ *               - taken_time
+ *           example:
+ *             doctor_id: 1
+ *             disease_name: "Hypertension"
+ *             icd10_code: "I10"
+ *             treatment_plan: "Lifestyle changes and medication"
+ *             symptoms: "High blood pressure, headache, dizziness"
+ *             taken_time: "2023-10-15T10:00:00Z"
+ *             note: "Patient advised to reduce salt intake"
+ *     responses:
+ *       201:
+ *         description: Diagnosis created successfully
+ *       400:
+ *         description: Invalid input data
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/:medicalRecordId/diagnoses', asyncHandler(medicalRecordController.addNewDiagnosis));
+
+/**
+ * @swagger
+ * /medical-records/{medicalRecordId}/diagnoses/{id}:
+ *   patch:
+ *     summary: Update an existing diagnosis for a specific medical record
+ *     tags: [Diagnoses]
+ *     parameters:
+ *       - in: path
+ *         name: medicalRecordId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the medical record
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the diagnosis
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               doctor_id:
+ *                 type: integer
+ *               disease_name:
+ *                 type: string
+ *               icd10_code:
+ *                 type: string
+ *               treatment_plan:
+ *                 type: string
+ *               symptoms:
+ *                 type: string
+ *               taken_time:
+ *                 type: string
+ *                 format: date-time
+ *               note:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Diagnosis updated successfully
+ *       404:
+ *         description: Diagnosis not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch(
+  '/:medicalRecordId/diagnoses/:id',
+  asyncHandler(medicalRecordController.editDiagnosis)
+);
+
+/**
+ * @swagger
+ * /medical-records/{medicalRecordId}/diagnoses/{id}:
+ *   delete:
+ *     summary: Delete a diagnosis for a specific medical record
+ *     tags: [Diagnoses]
+ *     parameters:
+ *       - in: path
+ *         name: medicalRecordId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the medical record
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the diagnosis
+ *     responses:
+ *       200:
+ *         description: Diagnosis deleted successfully
+ *       404:
+ *         description: Diagnosis not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete(
+  '/:medicalRecordId/diagnoses/:id',
+  asyncHandler(medicalRecordController.deleteDiagnosis)
+);
+
 export default router;
