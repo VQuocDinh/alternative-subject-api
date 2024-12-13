@@ -85,23 +85,36 @@ class PrescriptionService {
    * @throws {BadRequestError} If required fields are missing
    */
   static async addPrescription(prescriptionData) {
-    const { medical_record_id, doctor_id, prescribed_at, status } = prescriptionData;
+    const { medical_record_id, doctor_id, notes, medicines } = prescriptionData;
 
     // Validate input data
-    if (!doctor_id || !prescribed_at || !status) {
-      throw new BadRequestError('Doctor ID, prescribed date, and status are required');
+    if (!doctor_id || !medical_record_id) {
+      throw new BadRequestError('Doctor Id and Medical Id are required');
     }
 
-    const newPrescription = await db.Prescription.create(prescriptionData, {
-      include: [
-        {
-          model: db.PrescriptionMedicine,
-          as: 'PrescriptionMedicine',
-        },
-      ],
+    const prescription = await db.Prescription.create({
+      medical_record_id,
+      doctor_id,
+      notes,
+      status: 'new',
     });
 
-    return newPrescription;
+    // Create prescription medicines
+    if (medicines && medicines.length > 0) {
+      const prescriptionMedicines = medicines.map((medicine) => ({
+        prescription_id: prescription.id,
+        medicine_id: medicine.medicine_id,
+        quantity: medicine.quantity,
+        dosage: medicine.dosage,
+        frequency: medicine.frequency,
+        duration: medicine.duration,
+        instructions: medicine.instructions,
+      }));
+
+      await db.PrescriptionMedicine.bulkCreate(prescriptionMedicines);
+    }
+
+    return prescription;
   }
 
   /**

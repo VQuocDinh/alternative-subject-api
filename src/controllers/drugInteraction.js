@@ -3,6 +3,8 @@ import drugInteractionService from '../service/drugInteraction';
 
 const checkDrugInteraction = async (req, res, next) => {
   const { selectedDrugs, newDrug } = req.body;
+  console.log('selectedDrugs', selectedDrugs)
+  console.log('newDrug', newDrug)
   if (!selectedDrugs || !newDrug || !Array.isArray(selectedDrugs)) {
     throw new Error('Error: Data not provided');
   }
