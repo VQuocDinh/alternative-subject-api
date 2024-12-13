@@ -12,24 +12,37 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
-      temperature: {
-        type: DataTypes.DECIMAL,
+      weight: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      height: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      heart_rate: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      respiratory_rate: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       blood_pressure: {
         type: DataTypes.STRING,
+        allowNull: false,
       },
-      heart_rate: {
-        type: DataTypes.INTEGER,
+      temperature: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
       },
-      respiratory_rate: {
-        type: DataTypes.INTEGER,
+      bmi: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
       },
-      weight: {
-        type: DataTypes.DECIMAL,
-      },
-      height: {
-        type: DataTypes.DECIMAL,
+      note: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       create_at: {
         type: DataTypes.DATE,

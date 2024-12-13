@@ -192,6 +192,7 @@ router.post('/records/:id/vital-signs', asyncHandler(TreatmentController.addVita
  *         description: Medical record not found
  */
 router.get('/records/:id/vital-signs', asyncHandler(TreatmentController.getVitalSigns));
+
 /**
  * @swagger
  * /treatment/records/{id}/diagnosis:
@@ -237,5 +238,34 @@ router.get('/records/:id/vital-signs', asyncHandler(TreatmentController.getVital
  *         description: Medical record not found
  */
 router.patch('/records/:id/diagnosis', asyncHandler(TreatmentController.addDiagnosis));
+
+/**
+ * @swagger
+ * /treatment/records/patient/{patientId}:
+ *   get:
+ *     summary: Retrieve medical records by patient ID
+ *     tags: [Treatment]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           description: ID of the patient
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           description: Number of records per page
+ *     responses:
+ *       200:
+ *         description: List of medical records by patient ID
+ */
+router.get('/records/patient/:patientId', asyncHandler(TreatmentController.getRecordsByPatientId));
 
 export default router;

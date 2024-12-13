@@ -40,7 +40,7 @@ class PrescriptionService {
       ],
     });
 
-    if (!prescriptions.length) {
+    if (!prescriptions?.length) {
       throw new NotFoundError('No prescriptions found for the given patient ID');
     }
 
