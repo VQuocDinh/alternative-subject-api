@@ -3,9 +3,10 @@ import { SuccessResponse } from '../core/success.response.js';
 
 class PrescriptionController {
   getPrescriptionByPaTient = async (req, res, next) => {
+    const { patientId } = req.params;
     new SuccessResponse({
       message: 'Prescriptions retrieved successfully',
-      metadata: await prescriptionService.getPrescriptionByPatient(req.params.patientId),
+      metadata: await prescriptionService.getPrescriptionByPatient(patientId),
     }).send(res);
   };
 
