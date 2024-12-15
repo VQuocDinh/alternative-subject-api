@@ -76,6 +76,8 @@ const DoctorSpecialization = require('./specialization/doctorSpecialization.mode
 const User = require('./auth/user.model.js')(sequelize, Sequelize.DataTypes);
 const Roles = require('./auth/role.model.js')(sequelize, Sequelize.DataTypes);
 const Diagnosis = require('./medical-records/diagnosis.model')(sequelize, Sequelize.DataTypes);
+const KeyToken = require('./auth/keytoken.model')(sequelize, Sequelize.DataTypes);
+
 // Add các model vào object db
 db.User = User;
 db.Roles = Roles;
@@ -104,6 +106,7 @@ db.MedicationHistory = MedicationHistory;
 db.MedicationSchedule = MedicationSchedule;
 
 db.Diagnosis = Diagnosis;
+db.KeyToken = KeyToken;
 
 // Thiết lập quan hệ (associations)
 // Medical Record
@@ -248,6 +251,16 @@ db.Diagnosis.belongsTo(db.Disease, {
   foreignKey: 'icd10_code',
   targetKey: 'code',
   as: 'Disease',
+});
+
+// Associate for KeyToken
+db.User.hasMany(db.KeyToken, {
+  foreignKey: 'fk_user_id',
+  as: 'KeyTokens',
+});
+db.KeyToken.belongsTo(db.User, {
+  foreignKey: 'fk_user_id',
+  as: 'User',
 });
 
 // Synchronize models with database
