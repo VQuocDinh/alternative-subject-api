@@ -1,4 +1,3 @@
-export * from './auth';
 export * from './patient';
 export * from './staff';
 export * from './account';
