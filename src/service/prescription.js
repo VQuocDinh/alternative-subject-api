@@ -53,30 +53,39 @@ class PrescriptionService {
    * @returns {Object} Prescription details
    * @throws {NotFoundError} If the prescription is not found
    */
-  static async getPrescriptionById(id) {
-    const prescription = await db.Prescription.findByPk(id, {
-      include: [
-        {
-          model: db.Medicine,
+ static async getPrescriptionById(id) {
+  const prescription = await db.Prescription.findByPk(id, {
+    include: [
+      {
+        model: db.PrescriptionMedicine,
+        as: 'PrescriptionMedicines',  
+        include: [{ model: db.Medicine,
           as: 'Medicine',
-        },
-        {
-          model: db.Doctor,
-          as: 'Doctor',
-        },
-        {
-          model: db.MedicalRecord,
-          as: 'MedicalRecord',
-        },
-      ],
-    });
+         }],
+      },
+      {
+        model: db.Doctor,
+        as: 'Doctor',
+        include: [
+          {
+            model: db.Specialization,
+          },
+        ],
+      },
+      {
+        model: db.MedicalRecord,
+        as: 'MedicalRecord',
+        include: [{ model: db.Patient, as: 'Patient' }],
+      },
+    ],
+  });
 
-    if (!prescription) {
-      throw new NotFoundError('Prescription not found');
-    }
-
-    return prescription;
+  if (!prescription) {
+    throw new NotFoundError('Prescription not found');
   }
+
+  return prescription;
+}
 
   /**
    * Add a new prescription
@@ -96,14 +105,13 @@ class PrescriptionService {
       medical_record_id,
       doctor_id,
       notes,
-      status: 'new',
     });
 
     // Create prescription medicines
     if (medicines && medicines.length > 0) {
       const prescriptionMedicines = medicines.map((medicine) => ({
         prescription_id: prescription.id,
-        medicine_id: medicine.medicine_id,
+        medicine_id: medicine.id,
         quantity: medicine.quantity,
         dosage: medicine.dosage,
         frequency: medicine.frequency,
@@ -111,7 +119,12 @@ class PrescriptionService {
         instructions: medicine.instructions,
       }));
 
-      await db.PrescriptionMedicine.bulkCreate(prescriptionMedicines);
+      const createdPrescriptionMedicines = await db.PrescriptionMedicine.bulkCreate(prescriptionMedicines);
+      
+      // Tạo lịch cho từng thuốc
+      for (const prescriptionMedicine of createdPrescriptionMedicines) {
+          await createMedicationSchedules(prescriptionMedicine);
+      }
     }
 
     return prescription;
@@ -149,5 +162,55 @@ class PrescriptionService {
     }, {});
   }
 }
+
+const createMedicationSchedules = async (prescriptionMedicine) => {
+  try {
+      const startDate = new Date(prescriptionMedicine.start_date);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + parseInt(prescriptionMedicine.duration));
+
+      const timeSlots = {
+          '1 lần/ngày': ['07:30'],
+          '2 lần/ngày': ['07:30', '19:30'],
+          '3 lần/ngày': ['07:30', '12:30', '19:30'],
+          '4 lần/ngày': ['06:00', '12:00', '18:00', '22:00'],
+      };
+
+      // Kiểm tra frequency có hợp lệ không
+      if (!timeSlots[prescriptionMedicine.frequency]) {
+          throw new Error(`Invalid frequency: ${prescriptionMedicine.frequency}`);
+      }
+
+      const schedules = [];
+      const times = timeSlots[prescriptionMedicine.frequency];
+
+      // Clone startDate để không ảnh hưởng đến giá trị gốc
+      let currentDate = new Date(startDate);
+
+      // Lặp qua từng ngày từ startDate đến endDate
+      while (currentDate <= endDate) {
+          times.forEach((time) => {
+              const [hour, minute] = time.split(':');
+              const scheduleTime = new Date(currentDate);
+              scheduleTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
+
+              schedules.push({
+                  prescription_medicine_id: prescriptionMedicine.id,
+                  schedule_time: scheduleTime,
+                  status: 'pending',
+                  reminder_enabled: true,
+              });
+          });
+
+          // Tăng currentDate lên 1 ngày
+          currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return await db.MedicationSchedule.bulkCreate(schedules);
+  } catch (error) {
+      console.error('Error creating medication schedules:', error);
+      throw error;
+  }
+};
 
 export default PrescriptionService;

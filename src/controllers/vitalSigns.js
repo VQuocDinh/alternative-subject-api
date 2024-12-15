@@ -19,7 +19,6 @@ const getVitalSignsByPatient = async (req, res) => {
 const getVitalSignsByDate = async (req, res) => {
   try {
     const patient_id = req.body.patientId;
-    console.log(patient_id)
     const response = await db.vital_signs.findOne({
         where: {patient_id: patient_id},
         order: [['measured_at', 'DESC']],
@@ -101,7 +100,6 @@ const editVitalSigns = async (req, res) => {
 const addVitalSigns = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data.patient_records_id)
     const response = await db.vital_signs.create({
       patient_records_id: data.patient_records_id,
       patient_id: data.patientId
