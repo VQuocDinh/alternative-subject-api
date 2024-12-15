@@ -1,4 +1,3 @@
-import auth from './auth';
 import patient from './patient';
 import staff from './staff';
 import account from './account';
@@ -19,6 +18,7 @@ import medicine from './medicine';
 import drugInteraction from './drugInteraction';
 import treatment from './treatment';
 import disease from './disease';
+import auth from './auth';
 
 const initRoutes = (app) => {
   app.use('/api/auth', auth);

@@ -109,6 +109,14 @@ db.Diagnosis = Diagnosis;
 db.KeyToken = KeyToken;
 
 // Thiết lập quan hệ (associations)
+db.Roles.hasMany(db.User, {
+  foreignKey: 'role_id',
+  as: 'User',
+});
+db.User.belongsTo(db.Roles, {
+  foreignKey: 'role_id',
+  as: 'Role',
+});
 // Medical Record
 db.Doctor.hasMany(db.MedicalRecord, {
   foreignKey: 'doctor_id',
