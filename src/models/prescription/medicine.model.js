@@ -38,5 +38,13 @@ module.exports = (sequelize) => {
     }
   );
 
+  Medicine.associate = (models) => {
+    Medicine.belongsToMany(models.Prescription, {
+      through: models.PrescriptionMedicine,
+      foreignKey: 'medicine_id',
+      as: 'Prescriptions',
+    });
+  };
+
   return Medicine;
 };

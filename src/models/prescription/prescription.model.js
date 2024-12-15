@@ -10,13 +10,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       medical_record_id: {
         type: DataTypes.INTEGER,
-        // allowNull: false,
-        // references: { model: 'MedicalRecord', key: 'id' },
       },
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        // references: { model: 'Doctor', key: 'id' },
       },
       prescribed_at: {
         type: DataTypes.DATE,
@@ -27,9 +24,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
       status: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-        defaultValue: 'new'
+        type: DataTypes.ENUM('active', 'completed', 'cancelled'),
+        defaultValue: 'active',
       },
     },
     {
@@ -40,6 +36,22 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: 'updated_at',
     }
   );
+
+  Prescription.associate = (models) => {
+    // Relationship with PrescriptionMedicine
+    Prescription.hasMany(models.PrescriptionMedicine, {
+      foreignKey: 'prescription_id',
+      as: 'PrescriptionMedicines',
+    });
+
+    // Relationship with Medicine through PrescriptionMedicine
+    Prescription.belongsToMany(models.Medicine, {
+      through: models.PrescriptionMedicine,
+      foreignKey: 'prescription_id',
+      otherKey: 'medicine_id',
+      as: 'Medicines',
+    });
+  };
 
   return Prescription;
 };

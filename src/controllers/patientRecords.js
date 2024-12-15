@@ -46,7 +46,6 @@ const getPatientRecordsByRecord = async (req, res) => {
 
 const addPatientRecords = async (req, res) => {
   const { patientId, staffId, note, departmentId } = req.body;
-  console.log(patientId, staffId, note, departmentId);
   try {
     const response = await db.patient_records.create({
       patient_id: patientId,
@@ -70,7 +69,6 @@ const addPatientRecords = async (req, res) => {
 
 const updatePatientRecords = async (req, res) => {
   const { patient_records_id, symptoms, diagnosis } = req.body;
-  console.log(patient_records_id, symptoms, diagnosis);
   try {
     const response = await db.patient_records.update({
       symptoms,

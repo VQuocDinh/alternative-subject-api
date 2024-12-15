@@ -1,3 +1,4 @@
+// models/MedicationSchedule.js
 module.exports = (sequelize, DataTypes) => {
   const MedicationSchedule = sequelize.define(
     'MedicationSchedule',
@@ -16,13 +17,23 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('pending', 'completed', 'missed'),
         allowNull: false,
+        defaultValue: 'pending'
       },
       reminder_enabled: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+        defaultValue: true
       },
+      taken_time: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      notes: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      }
     },
     {
       tableName: 'medication_schedule',

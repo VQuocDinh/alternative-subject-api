@@ -17,7 +17,6 @@ const getById = async (req, res) => {
 const addMedicalRecords = async (req, res) => {
   try {
     const patient_id = req.body.patientId;
-    console.log(req.body.patientId);
     const response = await db.medical_records.create({
       patient_id: patient_id,
     });

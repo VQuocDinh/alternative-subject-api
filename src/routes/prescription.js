@@ -94,6 +94,6 @@ router.get('/:id', asyncHandler(PrescriptionController.getPrescriptionById));
  *       500:
  *         description: Internal server error
  */
-router.post('/add', PrescriptionController.addPrescription);
+router.post('/add', asyncHandler(PrescriptionController.addPrescription));
 
 export default router;
