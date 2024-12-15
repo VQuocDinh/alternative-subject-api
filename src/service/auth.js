@@ -9,7 +9,7 @@ class Auth {
   };
 
   async registerUser(email, password) {
-    const existingUser = await db.User.findOne({
+    const existingUser = await db.Doctor.findOne({
       where: { email },
     });
 
@@ -18,14 +18,14 @@ class Auth {
     }
 
     const hashedPassword = this.hashPassword(password);
-    await db.User.create({
+    await db.Doctor.create({
       email,
       password: hashedPassword,
     });
   }
 
   async loginUser(email, password) {
-    const user = await db.User.findOne({
+    const user = await db.Doctor.findOne({
       where: { email },
     });
 

@@ -27,7 +27,7 @@ class AuthService {
 
   static login = async ({ email, password, refreshToken = null }) => {
     // 1
-    const foundAccount = await db.User.findOne({
+    const foundAccount = await db.Doctor.findOne({
       where: { email },
       include: [
         {
@@ -82,7 +82,7 @@ class AuthService {
 
   static signUp = async ({ email, password, roleName }) => {
     // 1: Check email exist
-    const existingAccount = await db.User.findOne({ where: { email } });
+    const existingAccount = await db.Doctor.findOne({ where: { email } });
     if (existingAccount) {
       throw new BadRequestError('Error: Email already registered!');
     }
@@ -91,7 +91,7 @@ class AuthService {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // 3: Create new user
-    const newUser = await db.User.create({
+    const newUser = await db.Doctor.create({
       email,
       password: passwordHash,
       role_id: roleName ? await getRoleIdByName(roleName) : 1, // Default role_id is 1

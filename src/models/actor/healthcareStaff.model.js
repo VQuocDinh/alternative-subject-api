@@ -1,8 +1,8 @@
 import { DataTypes } from 'sequelize';
 
 module.exports = (sequelize) => {
-  const Doctor = sequelize.define(
-    'Doctor',
+  const HealthcareStaff = sequelize.define(
+    'HealthcareStaff',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -35,12 +35,12 @@ module.exports = (sequelize) => {
       },
     },
     {
-      tableName: 'doctor',
+      tableName: 'healthcare_staff',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     }
   );
 
-  return Doctor;
+  return HealthcareStaff;
 };
