@@ -12,6 +12,11 @@ module.exports = (sequelize) => {
       first_name: DataTypes.STRING,
       last_name: DataTypes.STRING,
       phone_number: DataTypes.STRING,
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
     },
     {
       tableName: 'doctor',
