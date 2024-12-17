@@ -33,7 +33,6 @@ class TreatmentService {
       order: [['created_at', 'DESC']],
     });
 
-    console.log(records);
 
     return {
       data: records,

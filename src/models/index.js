@@ -183,16 +183,6 @@ db.Prescription.belongsTo(db.MedicalRecord, {
   foreignKey: 'medical_record_id',
   as: 'MedicalRecord',
 });
-db.Prescription.belongsToMany(db.Medicine, {
-  through: db.PrescriptionMedicine,
-  foreignKey: 'prescription_id',
-  as: 'Medicine',
-});
-db.Medicine.belongsToMany(db.Prescription, {
-  through: db.PrescriptionMedicine,
-  foreignKey: 'medicine_id',
-  as: 'Prescription',
-});
 
 // Associate for Doctor Availability
 db.Doctor.hasMany(db.DoctorAvailability, {
@@ -291,6 +281,40 @@ db.Patient.hasMany(db.OAuth, {
 db.OAuth.belongsTo(db.Patient, {
   foreignKey: 'patient_id',
   as: 'Patient',
+});
+// Hoặc thiết lập trực tiếp
+db.Prescription.hasMany(db.PrescriptionMedicine, {
+  foreignKey: 'prescription_id',
+  as: 'PrescriptionMedicines',
+});
+
+db.PrescriptionMedicine.belongsTo(db.Prescription, {
+  foreignKey: 'prescription_id',
+  as: 'Prescription',
+});
+
+db.PrescriptionMedicine.belongsTo(db.Medicine, {
+  foreignKey: 'medicine_id',
+  as: 'Medicine',
+});
+
+db.Medicine.hasMany(db.PrescriptionMedicine, {
+  foreignKey: 'medicine_id',
+  as: 'PrescriptionMedicines',
+});
+
+db.Prescription.belongsToMany(db.Medicine, {
+  through: db.PrescriptionMedicine,
+  foreignKey: 'prescription_id',
+  otherKey: 'medicine_id',
+  as: 'Medicines',
+});
+
+db.Medicine.belongsToMany(db.Prescription, {
+  through: db.PrescriptionMedicine,
+  foreignKey: 'medicine_id',
+  otherKey: 'prescription_id',
+  as: 'Prescriptions',
 });
 
 // Synchronize models with database

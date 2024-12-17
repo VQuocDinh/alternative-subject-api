@@ -56,7 +56,6 @@ class PatientService {
 
   getById = async (patientId) => {
     const response = await db.Patient.findByPk(patientId);
-    console.log(response);
     if (!response) {
       throw new NotFoundError('Patient not found');
     }

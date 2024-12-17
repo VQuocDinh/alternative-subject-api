@@ -1,8 +1,31 @@
+const db = require("..");
+
 // models/PrescriptionMedicine.js
 module.exports = (sequelize, DataTypes) => {
   const PrescriptionMedicine = sequelize.define(
     'PrescriptionMedicine',
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      prescription_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: db.Prescription,
+          key: 'id',
+        },
+      },
+      medicine_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: db.Medicine,
+          key: 'id',
+        },
+      },
       quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -20,6 +43,15 @@ module.exports = (sequelize, DataTypes) => {
       instructions: {
         type: DataTypes.TEXT,
       },
+      start_date: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: DataTypes.NOW,
+      },
+      end_date: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       tableName: 'prescription_medicine',
@@ -29,6 +61,19 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: 'updated_at',
     }
   );
+
+  PrescriptionMedicine.associate = (models) => {
+    PrescriptionMedicine.belongsTo(models.Prescription, {
+      foreignKey: 'prescription_id',
+      as: 'Prescription',
+    });
+  
+    PrescriptionMedicine.belongsTo(models.Medicine, {
+      foreignKey: 'medicine_id',
+      as: 'Medicine',
+    });
+  };
+  
 
   return PrescriptionMedicine;
 };
