@@ -83,15 +83,15 @@ class OAuthService {
     };
   }
 
-  static async googleLogin(token) {
+  static async googleLogin(idToken) {
     const ticket = await client.verifyIdToken({
-      idToken: token,
+      idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
     const { sub: providerId, email } = payload;
 
-    // Check if the user already exists
+    // Check if the patient already exists
     let patient = await db.Patient.findOne({ where: { email } });
     if (!patient) {
       // Create a new patient if not exists
@@ -108,7 +108,7 @@ class OAuthService {
         patient_id: patient.id,
         provider: 'google',
         provider_id: providerId,
-        access_token: token,
+        access_token: idToken,
       });
     }
 
@@ -148,6 +148,16 @@ class OAuthService {
         email: patient.email,
       },
     };
+  }
+
+  static async exchangeCodeForTokens(code) {
+    const { tokens } = await client.getToken(code);
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    return { tokens, payload };
   }
 }
 
