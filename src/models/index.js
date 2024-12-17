@@ -73,13 +73,14 @@ const DoctorSpecialization = require('./specialization/doctorSpecialization.mode
   Sequelize.DataTypes
 );
 
-// const User = require('./auth/user.model.js')(sequelize, Sequelize.DataTypes);
+const User = require('./auth/user.model.js')(sequelize, Sequelize.DataTypes);
 const Roles = require('./auth/role.model.js')(sequelize, Sequelize.DataTypes);
 const Diagnosis = require('./medical-records/diagnosis.model')(sequelize, Sequelize.DataTypes);
 const KeyToken = require('./auth/keytoken.model')(sequelize, Sequelize.DataTypes);
+const OAuth = require('./auth/oauth.model')(sequelize, Sequelize.DataTypes);
 
 // Add các model vào object db
-// db.User = User;
+db.User = User;
 db.Roles = Roles;
 db.Specialization = Specialization;
 
@@ -107,17 +108,14 @@ db.MedicationSchedule = MedicationSchedule;
 
 db.Diagnosis = Diagnosis;
 db.KeyToken = KeyToken;
+db.OAuth = OAuth;
 
 // Thiết lập quan hệ (associations)
-db.Roles.hasMany(db.Doctor, {
+db.Roles.hasMany(db.User, {
   foreignKey: 'role_id',
-  as: 'Doctor',
+  as: 'User',
 });
-// db.User.belongsTo(db.Roles, {
-//   foreignKey: 'role_id',
-//   as: 'Role',
-// });
-db.Doctor.belongsTo(db.Roles, {
+db.User.belongsTo(db.Roles, {
   foreignKey: 'role_id',
   as: 'Role',
 });
@@ -266,13 +264,33 @@ db.Diagnosis.belongsTo(db.Disease, {
 });
 
 // Associate for KeyToken
-db.Doctor.hasMany(db.KeyToken, {
+db.User.hasMany(db.KeyToken, {
   foreignKey: 'fk_user_id',
   as: 'KeyTokens',
 });
-db.KeyToken.belongsTo(db.Doctor, {
+db.KeyToken.belongsTo(db.User, {
   foreignKey: 'fk_user_id',
+  as: 'User',
+});
+
+// Associate Doctor and User
+db.User.hasOne(db.Doctor, {
+  foreignKey: 'user_id',
   as: 'Doctor',
+});
+db.Doctor.belongsTo(db.User, {
+  foreignKey: 'user_id',
+  as: 'User',
+});
+
+// Associate Patient and OAuth
+db.Patient.hasMany(db.OAuth, {
+  foreignKey: 'patient_id',
+  as: 'OAuth',
+});
+db.OAuth.belongsTo(db.Patient, {
+  foreignKey: 'patient_id',
+  as: 'Patient',
 });
 
 // Synchronize models with database

@@ -19,9 +19,11 @@ import drugInteraction from './drugInteraction';
 import treatment from './treatment';
 import disease from './disease';
 import auth from './auth';
+import oauth from './oauth';
 
 const initRoutes = (app) => {
   app.use('/api/auth', auth);
+  app.use('/api/oauth', oauth);
   app.use('/api/patient', patient);
   app.use('/api/staff', staff);
   app.use('/api/account', account);

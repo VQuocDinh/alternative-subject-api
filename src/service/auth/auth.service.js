@@ -27,12 +27,16 @@ class AuthService {
 
   static login = async ({ email, password, refreshToken = null }) => {
     // 1
-    const foundAccount = await db.Doctor.findOne({
+    const foundAccount = await db.User.findOne({
       where: { email },
       include: [
         {
           model: db.Roles,
           as: 'Role',
+        },
+        {
+          model: db.Doctor,
+          as: 'Doctor',
         },
       ],
     });
@@ -46,12 +50,10 @@ class AuthService {
     const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
       modulusLength: 4096,
       publicKeyEncoding: {
-        // public key cryptographic standard
         type: 'pkcs1',
         format: 'pem',
       },
       privateKeyEncoding: {
-        // public key cryptographic standard
         type: 'pkcs1',
         format: 'pem',
       },
@@ -76,13 +78,14 @@ class AuthService {
         userId: foundAccount.id,
         email: foundAccount.email,
         role: foundAccount.Role?.name,
+        doctor: foundAccount.Doctor,
       },
     };
   };
 
   static signUp = async ({ email, password, roleName }) => {
     // 1: Check email exist
-    const existingAccount = await db.Doctor.findOne({ where: { email } });
+    const existingAccount = await db.User.findOne({ where: { email } });
     if (existingAccount) {
       throw new BadRequestError('Error: Email already registered!');
     }
@@ -91,13 +94,18 @@ class AuthService {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // 3: Create new user
-    const newUser = await db.Doctor.create({
+    const newUser = await db.User.create({
       email,
       password: passwordHash,
       role_id: roleName ? await getRoleIdByName(roleName) : 1, // Default role_id is 1
     });
 
-    // 4: Generate key pair
+    // 4: Create new doctor
+    await db.Doctor.create({
+      user_id: newUser.id,
+    });
+
+    // 5: Generate key pair
     const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
       modulusLength: 4096,
       publicKeyEncoding: {
@@ -110,14 +118,14 @@ class AuthService {
       },
     });
 
-    // 5: Create token pair
+    // 6: Create token pair
     const tokens = await createTokenPair(
       { userId: newUser.id, email, role: roleName },
       publicKey,
       privateKey
     );
 
-    // 6: Save key token
+    // 7: Save key token
     await createKeyToken({
       userId: newUser.id,
       refreshToken: tokens.refreshToken,
@@ -135,82 +143,6 @@ class AuthService {
       tokens,
     };
   };
-
-  //     // step 1: check username exist
-  //     const existingAccount = await getAccountByUsername(username);
-  //     if (existingAccount) {
-  //         throw new BadRequestError("Error: Username already registered!");
-  //     }
-  //     // Step 2: hashing password
-  //     const passwordHash = await bcrypt.hash(password, 10);
-
-  //     const role = await getRoleByName("customer");
-  //     if (!role) {
-  //         throw new BadRequestError("Role not found");
-  //     }
-
-  //     const newAccount = await createAccount({
-  //         userCode: generateUserCode(),
-  //         username,
-  //         password: passwordHash,
-  //         roleId: role.id,
-  //     });
-
-  //     if (newAccount) {
-  //         // created privateKey, publicKey
-  //         // use has private key
-  //         // system store public key
-  //         // private key use to sync token
-  //         // public key use to verify token
-  //         const { privateKey, publicKey } = crypto.generateKeyPairSync(
-  //             "rsa",
-  //             {
-  //                 modulusLength: 4096,
-  //                 publicKeyEncoding: {
-  //                     // public key cryptographic standard
-  //                     type: "pkcs1",
-  //                     format: "pem",
-  //                 },
-  //                 privateKeyEncoding: {
-  //                     // public key cryptographic standard
-  //                     type: "pkcs1",
-  //                     format: "pem",
-  //                 },
-  //             }
-  //         );
-  //         // if exist handle save to collection KeyStore
-  //         const publicKeyString = await createKeyToken({
-  //             userCode: newAccount.user_code,
-  //             publicKey,
-  //             privateKey,
-  //         });
-
-  //         if (!publicKeyString) {
-  //             throw new BadRequestError("Public key string error");
-  //         }
-
-  //         const publicKeyObject = crypto.createPublicKey(publicKeyString);
-  //         // create token pair
-  //         const tokens = await createTokenPair(
-  //             { userCode: newAccount.user_code, username },
-  //             publicKeyObject,
-  //             privateKey
-  //         );
-
-  //         return {
-  //             code: 201,
-  //             user: getInfoData({
-  //                 fields: ["user_code", "username", "is_active", "is_block"],
-  //                 object: newAccount,
-  //             }),
-  //             tokens: tokens,
-  //         };
-  //     }
-  //     return {
-  //         code: 201,
-  //         metadata: null,
-  //     };
-  // };
 }
 
 const getRoleIdByName = async (roleName) => {

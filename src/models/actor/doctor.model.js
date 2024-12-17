@@ -12,23 +12,7 @@ module.exports = (sequelize) => {
       first_name: DataTypes.STRING,
       last_name: DataTypes.STRING,
       phone_number: DataTypes.STRING,
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true,
-        },
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      status: {
-        type: DataTypes.ENUM('active', 'inactive', 'banned'),
-        defaultValue: 'active',
-      },
-      role_id: {
+      user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
