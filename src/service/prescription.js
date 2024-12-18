@@ -26,7 +26,7 @@ class PrescriptionService {
       include: [
         {
           model: db.Medicine,
-          as: 'Medicine',
+          as: 'Medicines',
         },
         {
           model: db.Doctor,

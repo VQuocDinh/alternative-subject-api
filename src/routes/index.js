@@ -21,6 +21,7 @@ import disease from './disease';
 import auth from './auth';
 import oauth from './oauth';
 import medicationSchedules from './medicationSchedules';
+import report from './report';
 
 const initRoutes = (app) => {
   app.use('/api/auth', auth);
@@ -46,6 +47,7 @@ const initRoutes = (app) => {
   app.use('/api/drug-interaction', drugInteraction);
   app.use('/api/disease', disease);
   app.use('/api/medication-schedules', medicationSchedules);
+  app.use('/api/report', report);
 
   return app.use('/', (req, res) => {
     return res.send('SERVER ON');
