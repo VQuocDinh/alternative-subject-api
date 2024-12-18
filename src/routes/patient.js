@@ -135,6 +135,39 @@ router.post('/search', asyncHandler(patientController.searchPatient));
 
 /**
  * @swagger
+ * /patient/searchByNameAndEmail:
+ *   post:
+ *     summary: Search for patients by name and email
+ *     tags: [Patients]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               full_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               page:
+ *                 type: integer
+ *                 description: Page number (default: 1)
+ *               limit:
+ *                 type: integer
+ *                 description: Items per page (default: 20)
+ *     responses:
+ *       200:
+ *         description: Patients retrieved successfully
+ *       404:
+ *         description: Patients not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/searchByNameAndEmail', asyncHandler(patientController.searchPatientByNameAndEmail));
+
+/**
+ * @swagger
  * /patient:
  *   post:
  *     summary: Create a new patient

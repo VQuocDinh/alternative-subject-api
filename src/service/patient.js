@@ -95,6 +95,46 @@ class PatientService {
     return response;
   };
 
+  static searchPatientByNameAndEmail = async ({ name, email, page = 1, limit = 20 }) => {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const whereClause = {};
+
+    if (name && email) {
+      whereClause[db.Sequelize.Op.and] = [
+        { full_name: { [db.Sequelize.Op.like]: `%${name}%` } },
+        { email: { [db.Sequelize.Op.like]: `%${email}%` } },
+      ];
+    } else {
+      if (name) {
+        whereClause.full_name = { [db.Sequelize.Op.like]: `%${name}%` };
+      }
+      if (email) {
+        whereClause.email = { [db.Sequelize.Op.like]: `%${email}%` };
+      }
+    }
+
+    const { rows: patients, count } = await db.Patient.findAndCountAll({
+      where: whereClause,
+      offset,
+      limit: parseInt(limit),
+      order: [['created_at', 'DESC']],
+    });
+
+    if (!patients || patients.length === 0) {
+      throw new NotFoundError('Patient not found');
+    }
+
+    return {
+      data: patients,
+      meta: {
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+        totalPages: Math.ceil(count / parseInt(limit)),
+        totalItems: count,
+      },
+    };
+  };
+
   static deletePatient = async (patientId) => {
     const response = await db.Patient.update(
       {

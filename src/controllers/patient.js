@@ -27,6 +27,17 @@ class PatientController {
     }).send(res);
   };
 
+  searchPatientByNameAndEmail = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await patientService.searchPatientByNameAndEmail({
+        name: req.body.full_name,
+        email: req.body.email,
+        page: req.body.page,
+        limit: req.body.limit,
+      }),
+    }).send(res);
+  };
+
   deletePatient = async (req, res, next) => {
     new SuccessResponse({
       metadata: await patientService.deletePatient(req.body.id),
