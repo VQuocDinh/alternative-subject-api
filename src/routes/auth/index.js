@@ -52,7 +52,6 @@ const router = express.Router();
  *                       type: string
  *                     role:
  *                       type: string
- *
  *                 tokens:
  *                   type: object
  *                   properties:
@@ -101,10 +100,6 @@ router.post('/register', asyncHandler(AuthController.registerUser));
  *                       type: string
  *                     role:
  *                       type: string
- *                 tokens:
- *                   type: object
- *                   properties:
- *                     accessToken:
  *                       type: string
  *                     refreshToken:
  *                       type: string

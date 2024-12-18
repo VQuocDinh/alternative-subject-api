@@ -60,6 +60,29 @@ const OAuthController = require('../../controllers/oauth.controller');
  */
 router.post('/google', OAuthController.googleLogin);
 
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback
+ *     tags: [OAuth]
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Google OAuth authorization code
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/google/callback', OAuthController.googleCallback);
+
 // ...existing code...
 
 module.exports = router;
