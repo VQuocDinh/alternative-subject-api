@@ -3,13 +3,12 @@ const OAuthService = require('../service/auth/oauth.service');
 
 class OAuthController {
   static async googleLogin(req, res, next) {
-    try {
-      const { token } = req.body;
-      const response = await OAuthService.googleLogin(token);
-      new SuccessResponse(response).send(res);
-    } catch (error) {
-      next(error);
-    }
+    const { code } = req.query;
+    const response = await OAuthService.googleLogin(code);
+
+    return res.redirect(
+      `http://localhost:3000/auth/login/oauth?access_token=${response?.tokens?.accessToken}&refresh_token=${response?.tokens?.refreshToken}&userId=${response?.user?.userId}&email=${response?.user?.email}`
+    );
   }
 
   static async googleCallback(req, res, next) {

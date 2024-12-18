@@ -1,163 +1,87 @@
 'use strict';
 
 const db = require('../../models');
-const { AuthFailureError, BadRequestError } = require('../../core/error.response');
-const { createTokenPair } = require('./auth.utils');
-const crypto = require('crypto');
-const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const { ForbiddenError } = require('../../core/error.response');
+const jwt = require('jsonwebtoken');
+const { default: axios } = require('axios');
+
+/**
+ * Hàm này thực hiện gửi yêu cầu lấy Google OAuth token dựa trên authorization code nhận được từ client-side.
+ * @param {string} code - Authorization code được gửi từ client-side.
+ * @returns {Object} - Đối tượng chứa Google OAuth token.
+ */
+const getOauthGoogleToken = async (code) => {
+  const body = {
+    code,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+    grant_type: 'authorization_code',
+  };
+  const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+  return data;
+};
+
+const getGoogleUser = async ({ id_token, access_token }) => {
+  const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+    params: {
+      access_token,
+      alt: 'json',
+    },
+    headers: {
+      Authorization: `Bearer ${id_token}`,
+    },
+  });
+  return data;
+};
 
 class OAuthService {
-  static async oauthLogin({ provider, providerId, accessToken, refreshToken }) {
-    // 1. Find the OAuth account
-    const oauthAccount = await db.OAuth.findOne({
-      where: { provider, provider_id: providerId },
-      include: [
-        {
-          model: db.Patient,
-          as: 'Patient',
-        },
-      ],
-    });
+  static async googleLogin(code) {
+    const data = await getOauthGoogleToken(code);
 
-    if (!oauthAccount) throw new BadRequestError('OAuth account not registered');
-
-    // 2. Generate key pair
-    const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-      modulusLength: 4096,
-      publicKeyEncoding: {
-        type: 'pkcs1',
-        format: 'pem',
-      },
-      privateKeyEncoding: {
-        type: 'pkcs1',
-        format: 'pem',
-      },
-    });
-
-    // 3. Create token pair
-    const tokens = await createTokenPair(
-      { userId: oauthAccount.Patient.id, email: oauthAccount.Patient.email },
-      publicKey,
-      privateKey
-    );
-
-    // 4. Save key token
-    await db.KeyToken.create({
-      fk_user_id: oauthAccount.Patient.id,
-      refreshToken: tokens.refreshToken,
-      privateKey,
-      publicKey,
-    });
-
-    return {
-      code: 200,
-      tokens,
-      user: {
-        userId: oauthAccount.Patient.id,
-        email: oauthAccount.Patient.email,
-      },
-    };
-  }
-
-  static async linkOAuthAccount({ patientId, provider, providerId, accessToken, refreshToken }) {
-    // 1. Check if the OAuth account already exists
-    const existingOAuthAccount = await db.OAuth.findOne({
-      where: { provider, provider_id: providerId },
-    });
-
-    if (existingOAuthAccount) throw new BadRequestError('OAuth account already linked');
-
-    // 2. Create new OAuth account
-    await db.OAuth.create({
-      patient_id: patientId,
-      provider,
-      provider_id: providerId,
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-
-    return {
-      code: 201,
-      message: 'OAuth account linked successfully',
-    };
-  }
-
-  static async googleLogin(idToken) {
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const { sub: providerId, email } = payload;
-
-    // Check if the patient already exists
-    let patient = await db.Patient.findOne({ where: { email } });
-    if (!patient) {
-      // Create a new patient if not exists
-      patient = await db.Patient.create({ email, full_name: payload.name });
+    const { id_token, access_token } = data; // Lấy ID token và access token từ kết quả trả về
+    const googleUser = await getGoogleUser({ id_token, access_token }); // Gửi Google OAuth token để lấy thông tin người dùng từ Google
+    if (!googleUser.verified_email) {
+      throw new ForbiddenError('Google email not verified');
     }
 
-    // Check if the OAuth account already exists
-    let oauthAccount = await db.OAuth.findOne({
-      where: { provider: 'google', provider_id: providerId },
-    });
-    if (!oauthAccount) {
-      // Create a new OAuth account if not exists
-      oauthAccount = await db.OAuth.create({
-        patient_id: patient.id,
-        provider: 'google',
-        provider_id: providerId,
-        access_token: idToken,
+    // Check if the patient already exists
+    let patient = await db.Patient.findOne({ where: { email: googleUser?.email } });
+    if (!patient) {
+      // Create a new patient if not exists
+      patient = await db.Patient.create({
+        email: googleUser?.email,
+        full_name: googleUser?.name || '',
       });
     }
 
-    // Generate key pair
-    const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-      modulusLength: 4096,
-      publicKeyEncoding: {
-        type: 'pkcs1',
-        format: 'pem',
-      },
-      privateKeyEncoding: {
-        type: 'pkcs1',
-        format: 'pem',
-      },
-    });
-
-    // Create token pair
-    const tokens = await createTokenPair(
-      { userId: patient.id, email: patient.email },
-      publicKey,
-      privateKey
+    // Generate JWT tokens
+    const accessToken = jwt.sign(
+      { userId: patient.id, email: patient.email, type: 'access_token' },
+      process.env.AC_PRIVATE_KEY,
+      { expiresIn: '15m' }
     );
-
-    // Save key token
-    await db.KeyToken.create({
-      fk_user_id: patient.id,
-      refreshToken: tokens.refreshToken,
-      privateKey,
-      publicKey,
-    });
+    const refreshToken = jwt.sign(
+      { userId: patient.id, email: patient.email, type: 'refresh_token' },
+      process.env.RF_PRIVATE_KEY,
+      { expiresIn: '100d' }
+    );
 
     return {
       code: 200,
-      tokens,
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
       user: {
         userId: patient.id,
         email: patient.email,
       },
     };
-  }
-
-  static async exchangeCodeForTokens(code) {
-    const { tokens } = await client.getToken(code);
-    const ticket = await client.verifyIdToken({
-      idToken: tokens.id_token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    return { tokens, payload };
   }
 }
 
