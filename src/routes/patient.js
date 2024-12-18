@@ -286,4 +286,39 @@ router.patch('/:id', asyncHandler(patientController.editPatient));
  */
 router.delete('/:id', asyncHandler(patientController.deletePatient));
 
+/**
+ * @swagger
+ * /patient/{id}/appointments:
+ *   get:
+ *     summary: Retrieve all appointments for a specific patient
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the patient
+ *       - in: query
+ *         name: startTime
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Start time to filter appointments
+ *       - in: query
+ *         name: endTime
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: End time to filter appointments
+ *     responses:
+ *       200:
+ *         description: Appointments retrieved successfully
+ *       404:
+ *         description: No appointments found for the specified patient
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:id/appointments', asyncHandler(patientController.getAppointmentsByPatientId));
+
 export default router;

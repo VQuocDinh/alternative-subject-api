@@ -143,13 +143,13 @@ router.delete('/:id', asyncHandler(AppointmentController.deleteAppointment));
 
 /**
  * @swagger
- * /appointment/doctor:
+ * /appointment/doctor/{doctorId}:
  *   get:
  *     summary: Get all appointments for a specific doctor on a specific day
  *     tags: [Appointments]
  *     parameters:
- *       - in: query
- *         name: doctor_id
+ *       - in: path
+ *         name: doctorId
  *         schema:
  *           type: integer
  *         required: true
@@ -165,7 +165,7 @@ router.delete('/:id', asyncHandler(AppointmentController.deleteAppointment));
  *       200:
  *         description: Appointments retrieved successfully
  */
-router.get('/doctor', asyncHandler(AppointmentController.getAppointmentsByDoctorAndDate));
+router.get('/doctor/:doctorId', asyncHandler(AppointmentController.getAppointmentsByDoctorAndDate));
 
 /**
  * @swagger

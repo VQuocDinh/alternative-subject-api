@@ -49,8 +49,9 @@ class AppointmentController {
   }
 
   async getAppointmentsByDoctorAndDate(req, res, next) {
-    const { doctor_id, date } = req.query;
-    const result = await AppointmentService.getAppointmentsByDoctorAndDate(doctor_id, date);
+    const { doctorId } = req.params;
+    const { date } = req.query;
+    const result = await AppointmentService.getAppointmentsByDoctorAndDate(doctorId, date);
     new SuccessResponse({
       message: 'Appointments retrieved successfully',
       metadata: result,

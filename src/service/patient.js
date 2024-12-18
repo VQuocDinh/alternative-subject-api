@@ -176,6 +176,23 @@ class PatientService {
     }
     return response;
   };
+
+  static getAppointmentsByPatientId = async (patientId, startTime, endTime) => {
+    const whereClause = { patient_id: patientId };
+    if (startTime && endTime) {
+      whereClause.appointment_taken_date = {
+        [db.Sequelize.Op.between]: [new Date(startTime), new Date(endTime)],
+      };
+    }
+    const appointments = await db.Appointment.findAll({
+      where: whereClause,
+      order: [['appointment_taken_date', 'DESC']],
+    });
+    if (!appointments || appointments.length === 0) {
+      throw new NotFoundError('No appointments found for the specified patient');
+    }
+    return appointments;
+  };
 }
 
 export default PatientService;

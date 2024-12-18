@@ -55,6 +55,16 @@ class PatientController {
       metadata: await patientService.editPatient(req.params.id, req.body),
     }).send(res);
   };
+
+  getAppointmentsByPatientId = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await patientService.getAppointmentsByPatientId(
+        req.params.id,
+        req.query.startTime,
+        req.query.endTime
+      ),
+    }).send(res);
+  };
 }
 
 export default new PatientController();
