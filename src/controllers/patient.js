@@ -41,7 +41,7 @@ class PatientController {
 
   editPatient = async (req, res, next) => {
     new SuccessResponse({
-      metadata: await patientService.editPatient(req.body),
+      metadata: await patientService.editPatient(req.params.id, req.body),
     }).send(res);
   };
 }

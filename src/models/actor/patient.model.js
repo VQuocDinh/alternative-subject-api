@@ -17,6 +17,10 @@ module.exports = (sequelize) => {
         allowNull: false,
         unique: true,
       },
+      gender: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       tableName: 'patient',
