@@ -149,11 +149,20 @@ class AppointmentService {
    * @returns {Array} List of appointments
    */
   static async getAppointmentsByDoctorAndDate(doctor_id, date) {
+    console.log('start');
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    console.log('query', startOfDay, endOfDay);
+
     const appointments = await db.Appointment.findAll({
       where: {
         doctor_id,
         appointment_taken_date: {
-          [db.Sequelize.Op.eq]: new Date(date),
+          [db.Sequelize.Op.between]: [startOfDay, endOfDay],
         },
       },
       order: [['appointment_taken_date', 'ASC']],

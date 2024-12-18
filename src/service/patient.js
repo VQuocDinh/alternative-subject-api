@@ -5,7 +5,7 @@ import { spawn } from 'child_process';
 import { BadRequestError, NotFoundError } from '../core/error.response.js';
 
 class PatientService {
-  getAll = async ({ page = 0, limit = 20 }) => {
+  static getAll = async ({ page = 0, limit = 20 }) => {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
     const offset = (pageNum - 1) * limitNum;
@@ -25,13 +25,13 @@ class PatientService {
     };
   };
 
-  saveImageToFile = async (image, filePath) => {
+  static saveImageToFile = async (image, filePath) => {
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const imageBuffer = Buffer.from(base64Data, 'base64');
     await fs.writeFile(filePath, imageBuffer);
   };
 
-  recognizeFace = (imagePath) => {
+  static recognizeFace = (imagePath) => {
     return new Promise((resolve, reject) => {
       const pythonProcess = spawn('python', ['face_recognition.py', imagePath]);
       let output = '';
@@ -54,7 +54,7 @@ class PatientService {
     });
   };
 
-  getById = async (patientId) => {
+  static getById = async (patientId) => {
     const response = await db.Patient.findByPk(patientId);
     if (!response) {
       throw new NotFoundError('Patient not found');
@@ -62,7 +62,7 @@ class PatientService {
     return response;
   };
 
-  getByFace = async (image) => {
+  static getByFace = async (image) => {
     const tempFileName = `temp_${Date.now()}.jpg`;
     const tempFilePath = path.join(__dirname, 'uploads', tempFileName);
 
@@ -77,7 +77,7 @@ class PatientService {
     }
   };
 
-  findByPk = async (patientId) => {
+  static findByPk = async (patientId) => {
     const response = await db.Patient.findByPk(patientId);
     if (!response) {
       throw new NotFoundError('Patient not found');
@@ -85,7 +85,7 @@ class PatientService {
     return response;
   };
 
-  searchPatient = async (cccd) => {
+  static searchPatient = async (cccd) => {
     const response = await db.Patient.findAll({
       where: { cccd: cccd },
     });
@@ -95,7 +95,47 @@ class PatientService {
     return response;
   };
 
-  deletePatient = async (patientId) => {
+  static searchPatientByNameAndEmail = async ({ name, email, page = 1, limit = 20 }) => {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const whereClause = {};
+
+    if (name && email) {
+      whereClause[db.Sequelize.Op.and] = [
+        { full_name: { [db.Sequelize.Op.like]: `%${name}%` } },
+        { email: { [db.Sequelize.Op.like]: `%${email}%` } },
+      ];
+    } else {
+      if (name) {
+        whereClause.full_name = { [db.Sequelize.Op.like]: `%${name}%` };
+      }
+      if (email) {
+        whereClause.email = { [db.Sequelize.Op.like]: `%${email}%` };
+      }
+    }
+
+    const { rows: patients, count } = await db.Patient.findAndCountAll({
+      where: whereClause,
+      offset,
+      limit: parseInt(limit),
+      order: [['created_at', 'DESC']],
+    });
+
+    if (!patients || patients.length === 0) {
+      throw new NotFoundError('Patient not found');
+    }
+
+    return {
+      data: patients,
+      meta: {
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+        totalPages: Math.ceil(count / parseInt(limit)),
+        totalItems: count,
+      },
+    };
+  };
+
+  static deletePatient = async (patientId) => {
     const response = await db.Patient.update(
       {
         status: 0,
@@ -110,7 +150,7 @@ class PatientService {
     return response;
   };
 
-  addPatient = async (patientData) => {
+  static addPatient = async (patientData) => {
     const response = await db.Patient.create(patientData);
     if (!response) {
       throw new Error('Error adding patient');
@@ -118,21 +158,17 @@ class PatientService {
     return response;
   };
 
-  editPatient = async (formValues) => {
+  static editPatient = async (id, formValues) => {
     const response = await db.Patient.update(
       {
         email: formValues.email,
-        phone_number: formValues.phone,
-        full_name: formValues.fullName,
+        phone: formValues.phone, // Corrected field name
+        full_name: formValues.full_name, // Corrected field name
         gender: formValues.gender,
-        date_of_birth: formValues.dateOfBirth,
-        address: formValues.address,
-        cccd: formValues.cccd,
-        emergency_contact_name: formValues.emergency_contact_name,
-        emergency_contact_name: formValues.emergency_contact_name,
+        dob: formValues.dob, // Corrected field name
       },
       {
-        where: { patient_id: formValues.patientId },
+        where: { id: id },
       }
     );
     if (!response) {
@@ -140,6 +176,23 @@ class PatientService {
     }
     return response;
   };
+
+  static getAppointmentsByPatientId = async (patientId, startTime, endTime) => {
+    const whereClause = { patient_id: patientId };
+    if (startTime && endTime) {
+      whereClause.appointment_taken_date = {
+        [db.Sequelize.Op.between]: [new Date(startTime), new Date(endTime)],
+      };
+    }
+    const appointments = await db.Appointment.findAll({
+      where: whereClause,
+      order: [['appointment_taken_date', 'DESC']],
+    });
+    if (!appointments || appointments.length === 0) {
+      throw new NotFoundError('No appointments found for the specified patient');
+    }
+    return appointments;
+  };
 }
 
-export default new PatientService();
+export default PatientService;

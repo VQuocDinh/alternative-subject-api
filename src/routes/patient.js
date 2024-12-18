@@ -135,6 +135,39 @@ router.post('/search', asyncHandler(patientController.searchPatient));
 
 /**
  * @swagger
+ * /patient/searchByNameAndEmail:
+ *   post:
+ *     summary: Search for patients by name and email
+ *     tags: [Patients]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               full_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               page:
+ *                 type: integer
+ *                 description: Page number (default: 1)
+ *               limit:
+ *                 type: integer
+ *                 description: Items per page (default: 20)
+ *     responses:
+ *       200:
+ *         description: Patients retrieved successfully
+ *       404:
+ *         description: Patients not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/searchByNameAndEmail', asyncHandler(patientController.searchPatientByNameAndEmail));
+
+/**
+ * @swagger
  * /patient:
  *   post:
  *     summary: Create a new patient
@@ -252,5 +285,40 @@ router.patch('/:id', asyncHandler(patientController.editPatient));
  *         description: Internal server error
  */
 router.delete('/:id', asyncHandler(patientController.deletePatient));
+
+/**
+ * @swagger
+ * /patient/{id}/appointments:
+ *   get:
+ *     summary: Retrieve all appointments for a specific patient
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the patient
+ *       - in: query
+ *         name: startTime
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Start time to filter appointments
+ *       - in: query
+ *         name: endTime
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: End time to filter appointments
+ *     responses:
+ *       200:
+ *         description: Appointments retrieved successfully
+ *       404:
+ *         description: No appointments found for the specified patient
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:id/appointments', asyncHandler(patientController.getAppointmentsByPatientId));
 
 export default router;

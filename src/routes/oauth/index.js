@@ -13,8 +13,8 @@ const OAuthController = require('../../controllers/oauth.controller');
 
 /**
  * @swagger
- * /auth/google:
- *   post:
+ * /oauth/google:
+ *   get:
  *     summary: Login with Google OAuth
  *     tags: [OAuth]
  *     requestBody:
@@ -58,11 +58,11 @@ const OAuthController = require('../../controllers/oauth.controller');
  *       500:
  *         description: Internal server error
  */
-router.post('/google', OAuthController.googleLogin);
+router.get('/google', OAuthController.googleLogin);
 
 /**
  * @swagger
- * /auth/google/callback:
+ * /oauth/google/callback:
  *   get:
  *     summary: Google OAuth callback
  *     tags: [OAuth]

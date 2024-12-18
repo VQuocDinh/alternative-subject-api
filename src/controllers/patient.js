@@ -27,6 +27,17 @@ class PatientController {
     }).send(res);
   };
 
+  searchPatientByNameAndEmail = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await patientService.searchPatientByNameAndEmail({
+        name: req.body.full_name,
+        email: req.body.email,
+        page: req.body.page,
+        limit: req.body.limit,
+      }),
+    }).send(res);
+  };
+
   deletePatient = async (req, res, next) => {
     new SuccessResponse({
       metadata: await patientService.deletePatient(req.body.id),
@@ -41,7 +52,17 @@ class PatientController {
 
   editPatient = async (req, res, next) => {
     new SuccessResponse({
-      metadata: await patientService.editPatient(req.body),
+      metadata: await patientService.editPatient(req.params.id, req.body),
+    }).send(res);
+  };
+
+  getAppointmentsByPatientId = async (req, res, next) => {
+    new SuccessResponse({
+      metadata: await patientService.getAppointmentsByPatientId(
+        req.params.id,
+        req.query.startTime,
+        req.query.endTime
+      ),
     }).send(res);
   };
 }
