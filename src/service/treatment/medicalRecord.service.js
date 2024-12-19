@@ -65,8 +65,8 @@ class MedicalRecordService {
     const { patient_id, doctor_id, diagnosis, symptoms, treatment_plan, status } = data;
 
     // Validate input data
-    if (!diagnosis || !patient_id || !doctor_id) {
-      throw new BadRequestError('Diagnosis, Patient ID, and Doctor ID are required');
+    if (!patient_id || !doctor_id) {
+      throw new BadRequestError(' Patient ID, and Doctor ID are required');
     }
 
     const newRecord = await db.MedicalRecord.create({
