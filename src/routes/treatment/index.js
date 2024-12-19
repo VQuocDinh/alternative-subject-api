@@ -270,6 +270,30 @@ router.get('/records/patient/:patientId', asyncHandler(TreatmentController.getRe
 
 /**
  * @swagger
+ * /treatment/patient/{patientId}/vital-signs:
+ *   get:
+ *     summary: Get all vital signs of a specific patient
+ *     tags: [Treatment]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Patient ID
+ *     responses:
+ *       200:
+ *         description: List of vital signs of the patient
+ *       404:
+ *         description: Patient not found
+ */
+router.get(
+  '/patient/:patientId/vital-signs',
+  asyncHandler(TreatmentController.getAllVitalSignsByPatientId)
+);
+
+/**
+ * @swagger
  * /treatment/vital-signs/{id}:
  *   delete:
  *     summary: Delete a vital sign by ID

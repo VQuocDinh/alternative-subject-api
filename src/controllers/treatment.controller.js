@@ -114,6 +114,17 @@ class TreatmentController {
       }),
     }).send(res);
   };
+
+  /**
+   * Lấy tất cả chỉ số sinh tồn của một bệnh nhân
+   */
+  getAllVitalSignsByPatientId = async (req, res, next) => {
+    const { patientId } = req.params;
+
+    new SuccessResponse({
+      metadata: await TreatmentService.getAllVitalSignsByPatientId(patientId),
+    }).send(res);
+  };
 }
 
 export default new TreatmentController();

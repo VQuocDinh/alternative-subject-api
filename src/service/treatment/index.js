@@ -33,7 +33,6 @@ class TreatmentService {
       order: [['created_at', 'DESC']],
     });
 
-
     return {
       data: records,
       meta: {
@@ -266,6 +265,32 @@ class TreatmentService {
 
     return vitalSigns;
   }
+
+  /**
+   * Lấy tất cả chỉ số sinh tồn của một bệnh nhân
+   * @param {number} patientId - ID của bệnh nhân
+   * @returns {Array} Danh sách các chỉ số sinh tồn của bệnh nhân
+   */
+  static async getAllVitalSignsByPatientId(patientId) {
+    const patient = await db.Patient.findByPk(patientId);
+    if (!patient) {
+      throw new NotFoundError('Patient not found');
+    }
+
+    const vitalSigns = await db.VitalSigns.findAll({
+      include: [
+        {
+          model: db.MedicalRecord,
+          as: 'MedicalRecord',
+          where: { patient_id: patientId },
+        },
+      ],
+      order: [['create_at', 'DESC']],
+    });
+
+    return vitalSigns;
+  }
+
   /**
    * Bác sĩ chuẩn đoán bệnh cho bệnh nhân
    * @param {number} medicalRecordId - ID của bệnh án
